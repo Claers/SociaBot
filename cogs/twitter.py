@@ -65,8 +65,6 @@ class Twitter(Cog):
         coro = self.get_tweet(tweet, server_id)
         self.future_tweet_listener = asyncio.run_coroutine_threadsafe(
             coro, loop)
-        result = self.future_tweet_listener.result()
-        print(result)
 
     async def get_tweet(self, tweet, server_id):
         guild = self.bot.get_guild(int(server_id))
@@ -83,7 +81,7 @@ class Twitter(Cog):
         username = api.me().name
         server = models.session.query(models.Server).filter(
             models.Server.server_id == str(ctx.guild.id)).first()
-        tweet_object_content = []
+        tweet_object_content = {}
         tweet_object_content['tweet'] = tweet
         tweet_object_content['account_id'] = server.twitter_account_id
         if len(ctx.message.attachments) == 1:
@@ -96,7 +94,7 @@ class Twitter(Cog):
             tweet_object_content = await self.__tweet_without_media(
                 ctx, tweet, api, username, server, tweet_object_content
             )
-
+        await self.__send_tweet_object(tweet_object_content)
         await ctx.send(
             "Bravo {0} ! Votre tweet a été envoyé : ".format(
                 ctx.author.name)
@@ -121,6 +119,7 @@ class Twitter(Cog):
         tweet_url = "https://twitter.com/{0}/status/{1}".format(username,
                                                                 tweet_id)
         tweet_object_content['tweet_url'] = tweet_url
+        tweet_object_content['media_url'] = ""
         return tweet_object_content
 
     async def __tweet_with_media_logic(
@@ -167,12 +166,9 @@ class Twitter(Cog):
         tweet_id = tweetJson._json['id_str']
         tweet_url = "https://twitter.com/{0}/status/{1}".format(username,
                                                                 tweet_id)
-        tweet_object = models.Tweet(
-            tweet_content=tweet,
-            image_url=media_url,
-            tweet_url=tweet_url,
-            tweet_date=datetime.now(),
-            twitter_account_id=server.twitter_account_id)
+        media_url = tweetJson._json['entities']['media'][0]['media_url']
+        tweet_object_content['tweet_url'] = tweet_url
+        tweet_object_content['media_url'] = media_url
         return tweet_object_content
 
     async def __tweet_with_video(
@@ -278,19 +274,6 @@ class Twitter(Cog):
     async def __tweet_with_multiple_media(
             self, ctx, tweet, api, username, server):
         pass
-
-    @commands.command()
-    async def test(self, ctx):
-        url = "https://stream.twitter.com/1.1/statuses/filter.json?follow=4573508235"
-        auth = OAuth1(settings.TwitterKey, settings.TwitterSecret,
-                      self.account[str(ctx.guild.id)].access_token,
-                      self.account[str(ctx.guild.id)].access_token_secret
-                      )
-        resp = requests.post(
-            url, auth=auth
-        )
-        print(resp)
-        print(resp.text)
 
     @commands.command(name="deleteTweet")
     @checks.is_server()

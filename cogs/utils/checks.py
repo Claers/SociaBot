@@ -32,10 +32,7 @@ def is_server():
 
 def is_server_admin_check(message):
     if is_server_check(message):
-        server = models.session.query(
-            models.Server).filter(models.Server.server_id ==
-                                  str(message.guild.id)).first()
-        return server.admin_id == str(message.author.id)
+        return message.guild.owner_id == message.author.id
     else:
         message.content = "is_server"
         return False

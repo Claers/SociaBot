@@ -5,7 +5,6 @@ import discord
 import asyncio
 from datetime import datetime
 import sys
-from requests_oauthlib import OAuth1Session
 from discord.ext.commands import Bot
 from discord.ext.commands.errors import CheckFailure
 
@@ -28,6 +27,19 @@ async def on_ready():
     game = discord.Game(name="Connected on " + str(len(client.guilds))
                         + " servers ", start=datetime.now())
     await client.change_presence(activity=game)
+    for guild in client.guilds:
+        server = models.session.query(
+            models.Server).filter(models.Server.server_id ==
+                                  str(guild.id)).first()
+        if server is None:
+            serv = models.Server(
+                server_id=str(guild.id),
+                server_name=guild.name,
+                admin_id=str(guild.owner.id),
+                admin_name=guild.owner.name
+            )
+            models.session.add(serv)
+            models.session.commit()
 
 
 @client.event
