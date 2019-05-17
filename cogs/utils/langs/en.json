@@ -1,0 +1,11 @@
+{
+    "array": [
+        1,
+        2,
+        3
+    ],
+    "is_private_error": [
+        "You can't use this command here !",
+        "Type the command here !"
+    ]
+}

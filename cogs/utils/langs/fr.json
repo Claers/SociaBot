@@ -1,0 +1,12 @@
+{
+    "array": [
+        1,
+        2,
+        3
+    ],
+    "is_private_error": [
+        "Vous ne pouvez pas utiliser cette commande ici !",
+        "Merci de taper cette commande ici !"
+    ],
+    "is_server_error": "Vous ne pouvez pas utiliser cette commande ici ! \n Merci de passer par un serveur !"
+}

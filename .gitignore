@@ -56,3 +56,8 @@ docs/_build/
 
 # PyBuilder
 target/
+
+.mypy_cache/
+
+\.vscode/
+.pytest_cache/
