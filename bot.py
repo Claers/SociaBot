@@ -2,7 +2,6 @@ import cogs.utils.settings as settings
 import cogs.utils.models as models
 import cogs.utils.languages as lang
 import discord
-import asyncio
 from datetime import datetime
 import sys
 from discord.ext.commands import Bot

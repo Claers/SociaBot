@@ -81,15 +81,19 @@ class Twitter(Cog):
         username = api.me().name
         server = models.session.query(models.Server).filter(
             models.Server.server_id == str(ctx.guild.id)).first()
+        print(server)
         tweet_object_content = {}
         tweet_object_content['tweet'] = tweet
         tweet_object_content['account_id'] = server.twitter_account_id
+        )
         if len(ctx.message.attachments) == 1:
-            tweet_object_content = await self.__tweet_with_media_logic(
+            tweet_object_content=await self.__tweet_with_media_logic(
                 ctx, tweet, api, username, server, tweet_object_content
             )
         elif len(ctx.message.attachments) > 1:
-            pass
+            tweet_object_content = await self.__tweet_with_multiple_media(
+                ctx, tweet, api, username, server, tweet_object_content
+            )
         else:
             tweet_object_content = await self.__tweet_without_media(
                 ctx, tweet, api, username, server, tweet_object_content
@@ -104,12 +108,28 @@ class Twitter(Cog):
     async def __send_tweet_object(self, tweet_object_content):
         tweet_object = models.Tweet(
             tweet_content=tweet_object_content['tweet'],
-            image_url=tweet_object_content['media_url'],
             tweet_url=tweet_object_content['tweet_url'],
             tweet_date=datetime.now(),
             twitter_account_id=tweet_object_content['account_id']
         )
         models.session.add(tweet_object)
+        models.session.flush()
+        if tweet_object_content['media_url'] != "":
+            media_object = models.TweetMedia(
+                media_url=tweet_object_content['media_url']
+            )
+            models.session.add(media_object)
+            models.session.flush()
+            tweet_object.media_id.append(media_object)
+        elif type(tweet_object_content['media_url']) == list:
+            for media_url in tweet_object_content['media_url']:
+                media_object = models.TweetMedia(
+                    media_url=tweet_object_content['media_url']
+                )
+                models.session.add(media_object)
+                models.session.flush()
+                tweet_object.media_id.append(media_object)
+        models.session.flush()
         models.session.commit()
 
     async def __tweet_without_media(self, ctx, tweet, api,
@@ -187,12 +207,8 @@ class Twitter(Cog):
         tweet_id = response.json()['id']
         tweet_url = "https://twitter.com/{0}/status/{1}".format(username,
                                                                 tweet_id)
-        tweet_object = models.Tweet(
-            tweet_content=tweet,
-            image_url=media_url,
-            tweet_url=tweet_url,
-            tweet_date=datetime.now(),
-            twitter_account_id=server.twitter_account_id)
+        tweet_object_content['tweet_url'] = tweet_url
+        tweet_object_content['media_url'] = video_url
         return tweet_object_content
 
     async def __get_best_bitrate_video(self, json):
@@ -273,7 +289,29 @@ class Twitter(Cog):
 
     async def __tweet_with_multiple_media(
             self, ctx, tweet, api, username, server):
-        pass
+        medias_id = []
+        for attachements in ctx.message.attachements:
+            media_id, auth = await self.__twitter_post_media(
+                ctx, media_request.content, video,
+                content_type, content_extension
+            )
+            medias_id.append(media_id)
+        url = 'https://api.twitter.com/1.1/statuses/update.json'
+        response = requests.post(
+            url, auth=auth, data={
+                "status": tweet,
+                "media_ids": medias_id
+            }
+        )
+        videos_url = response.json(
+        )['extended_entities']['media'][0]['video_info']['variants']
+        video_url = await self.__get_best_bitrate_video(videos_url)
+        tweet_id = response.json()['id']
+        tweet_url = "https://twitter.com/{0}/status/{1}".format(username,
+                                                                tweet_id)
+        tweet_object_content['tweet_url'] = tweet_url
+        tweet_object_content['media_url'] = video_url
+        return tweet_object_content
 
     @commands.command(name="deleteTweet")
     @checks.is_server()
@@ -283,6 +321,10 @@ class Twitter(Cog):
         tweet_object = models.session.query(
             models.Tweet).filter(models.Tweet.tweet_url ==
                                  tweetURL).first()
+        medias = tweet_object.media_id
+        for media in medias:
+            models.session.delete(media)
+            models.session.flush()
         models.session.delete(tweet_object)
         models.session.flush()
         models.session.commit()
@@ -311,7 +353,7 @@ class MyStreamListener(tweepy.StreamListener):
                                                                 tweet_id)
         tweet = "Nouveau tweet : " + tweet_url
         self.bot.cogs['Twitter'].loop_handle(
-            tweet_url, self.server_id)
+            tweet, self.server_id)
 
 
 def setup(bot):

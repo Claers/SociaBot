@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 import cogs.utils.settings as settings
 from sqlalchemy_utils import URLType
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
 
 Base = declarative_base()
 engine = create_engine(settings.DATABASE_URI)
@@ -44,7 +44,7 @@ class Tweet(Base):
     __tablename__ = "tweet"
     id = Column(Integer, primary_key=True)
     tweet_content = Column(String(280))
-    image_url = Column(URLType)
+    media_id = relationship("TweetMedia")
     tweet_url = Column(URLType)
     tweet_date = Column(DateTime)
     twitter_account_id = Column(Integer, ForeignKey("twitter_account.id"))
@@ -52,6 +52,17 @@ class Tweet(Base):
     def __repr__(self):
         return "<Tweet(id='{}', content='{}', url='{}')>"\
             .format(self.id, self.tweet_content, self.tweet_url)
+
+
+class TweetMedia(Base):
+    __tablename__ = "tweet_media"
+    id = Column(Integer, primary_key=True)
+    media_url = Column(URLType)
+    tweet_id = Column(Integer, ForeignKey("tweet.id"))
+
+    def __repr__(self):
+        return "<TweetMedia(id='{}', media_url='{}')>"\
+            .format(self.id, self.media_url)
 
 
 Base.metadata.create_all(engine)
