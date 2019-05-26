@@ -50,7 +50,14 @@ async def on_guild_join(guild):
     models.session.commit()
 
 
+@client.event
+async def on_raw_reaction_add(payload):
+    print(payload.message_id)
+
+
+@client.event
 async def on_command_error(ctx, error):
+    print("error")
     if type(error) == CheckFailure:
         if(ctx.message.content == "is_private"):
             await ctx.send('\N{NO ENTRY} ' +
@@ -65,6 +72,13 @@ async def on_command_error(ctx, error):
     else:
         print(error)
 
+clientid = "myclientid"
+url = 'https://api.twitch.tv/helix/webhook/hub'
+payload = {
+    "hub.mode": "subscribe",
+    "hub.topic": "https://api.twitch.tv/helix/streams?user_id=162917759",
+    "hub.lease_seconds": 864000
+}
 
 if __name__ == '__main__':
     for extension in extensions:

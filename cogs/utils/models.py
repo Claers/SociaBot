@@ -11,14 +11,22 @@ Session = sessionmaker(engine)
 session = Session()
 
 
+class User(Base):
+    __tablename__ = "user"
+    id = Column(Integer, primary_key=True)
+    discord_user_id = Column(String)
+    discord_guild_ids = relationship("Server")
+    twitter_account_id = Column(Integer, ForeignKey("twitter_account.id"))
+
+
 class Server(Base):
     __tablename__ = "server"
     id = Column(Integer, primary_key=True)
     server_id = Column(String)
     server_name = Column(String)
-    admin_id = Column(String)
+    discord_admin_id = Column(String)
+    admin_id = Column(Integer, ForeignKey("user.id"))
     admin_name = Column(String)
-    twitter_account_id = Column(Integer, ForeignKey("twitter_account.id"))
 
     def __repr__(self):
         return "<Server(id='{}', server_name='{}', admin_name='{}')>"\
@@ -28,8 +36,7 @@ class Server(Base):
 class TwitterAccount(Base):
     __tablename__ = "twitter_account"
     id = Column(Integer, primary_key=True)
-    server_id = Column(Integer, ForeignKey("server.id"))
-    admin_id = Column(String)
+    user_id = Column(Integer, ForeignKey("user.id"))
     twitter_name = Column(String)
     access_token = Column(String)
     access_secret = Column(String)
@@ -63,6 +70,13 @@ class TweetMedia(Base):
     def __repr__(self):
         return "<TweetMedia(id='{}', media_url='{}')>"\
             .format(self.id, self.media_url)
+
+
+class TwitchAccount(Base):
+    __tablename__ = "twitch_account"
+    id = Column(Integer, primary_key=True)
+    twitch_name = Column(String)
+    twitch_url = Column(URLType)
 
 
 Base.metadata.create_all(engine)

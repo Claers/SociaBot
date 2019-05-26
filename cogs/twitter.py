@@ -1,5 +1,4 @@
 """Twitter module for SociaBot discord bot
-
 """
 from datetime import datetime
 from io import BytesIO
@@ -9,7 +8,7 @@ import asyncio
 import base64
 import math
 from requests_oauthlib import OAuth1
-
+import discord
 
 from discord.ext.commands import Cog
 from discord.ext import commands
@@ -85,9 +84,8 @@ class Twitter(Cog):
         tweet_object_content = {}
         tweet_object_content['tweet'] = tweet
         tweet_object_content['account_id'] = server.twitter_account_id
-        )
         if len(ctx.message.attachments) == 1:
-            tweet_object_content=await self.__tweet_with_media_logic(
+            tweet_object_content = await self.__tweet_with_media_logic(
                 ctx, tweet, api, username, server, tweet_object_content
             )
         elif len(ctx.message.attachments) > 1:
@@ -337,6 +335,11 @@ class Twitter(Cog):
         await ctx.send(
             "Bravo {0} ! Votre tweet a été supprimé !".format(ctx.author.name))
         await ctx.message.delete()
+
+
+class SociaBotClient(discord.Client):
+    async def on_reaction_add(self, reaction, user):
+        print(reaction)
 
 
 class MyStreamListener(tweepy.StreamListener):

@@ -1,7 +1,8 @@
+import inspect
+import sys
 from discord.ext import commands
 from .utils import checks
 from discord.ext.commands import Cog
-import inspect
 
 
 class Admin(Cog):
@@ -50,8 +51,9 @@ class Admin(Cog):
     @commands.command(hidden=True)
     @checks.is_owner()
     async def shutdown(self, ctx):
-        await self.bot.close()
         await ctx.send("G'bye" + '\N{RAISED HAND}')
+        await self.bot.close()
+        sys.exit()
 
     @commands.command(pass_context=True, hidden=True)
     @checks.is_owner()
