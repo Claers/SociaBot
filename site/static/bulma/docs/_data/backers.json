@@ -1,0 +1,118 @@
+{
+  "10": [
+    {
+      "name": "Charles Treece",
+      "twitter": "charlestreece",
+      "start_timestamp": 1529691809367
+    },
+    {
+      "name": "Dmitry Malyshev",
+      "twitter": "",
+      "start_timestamp": 1527750137010
+    },
+    {
+      "name": "Franz Geffke",
+      "twitter": "f_anzs",
+      "start_timestamp": 1534701757930
+    },
+    {
+      "name": "Jason Seminara",
+      "twitter": "",
+      "start_timestamp": 1532955289949
+    },
+    {
+      "name": "Jordan Nemrow",
+      "twitter": "",
+      "start_timestamp": 1510767260223
+    },
+    {
+      "name": "Leo Zeba",
+      "twitter": "leozeba",
+      "start_timestamp": 1511898573597
+    },
+    {
+      "name": "Stuart Stanfield",
+      "twitter": "",
+      "start_timestamp": 1527579663355
+    },
+    {
+      "name": "Takayuki Yamaguchi",
+      "twitter": "takyam",
+      "start_timestamp": 1512366265358
+    },
+    {
+      "name": "Tyler Weeres",
+      "twitter": "tweeres04",
+      "start_timestamp": 1552764835672
+    },
+    {
+      "name": "Wikiki",
+      "twitter": "",
+      "start_timestamp": 1510677732534
+    }
+  ],
+  "30": [
+    {
+      "name": "Aaron",
+      "twitter": "aequasi",
+      "start_timestamp": 1511242659284
+    },
+    {
+      "name": "Adrian Ocneanu",
+      "twitter": "aocneanu",
+      "start_timestamp": 1510731567799,
+      "website_url": "https://www.earthlink.ro/",
+      "website_name": "Earthlink"
+    },
+    {
+      "name": "Garry Newman",
+      "twitter": "garrynewman",
+      "start_timestamp": 1511186868165
+    },
+    {
+      "name": "Roman Chvanikoff",
+      "twitter": "",
+      "start_timestamp": 1554650361520
+    }
+  ],
+  "100": [
+    {
+      "name": "DontPayFull",
+      "twitter": "",
+      "start_timestamp": 1535455908636
+    },
+    {
+      "name": "HebergeurWeb.ca",
+      "twitter": "",
+      "start_timestamp": 1544758597015
+    },
+    {
+      "name": "Phil Alves",
+      "twitter": "philalves01",
+      "start_timestamp": 1541989777176
+    },
+    {
+      "name": "Robert Bolder",
+      "twitter": "",
+      "start_timestamp": 1546593784071
+    },
+    {
+      "name": "Tooltwist",
+      "twitter": "",
+      "start_timestamp": 1522552630215
+    },
+    {
+      "name": "usave",
+      "twitter": "",
+      "start_timestamp": 1554906720385
+    }
+  ],
+  "300": [],
+  "500": [
+    {
+      "name": "Tipe",
+      "twitter": "tipeio",
+      "start_timestamp": 1532102606749
+    }
+  ]
+}

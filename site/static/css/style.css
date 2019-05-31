@@ -1,0 +1,94 @@
+.navbar-item img {
+    max-height: 2.75rem;
+}
+
+.switch[type=checkbox].is-dark:checked+label::before {
+    background: rgb(173, 173, 173);
+}
+
+.switch[type=checkbox].is-dark+label::before {
+    background: rgb(26, 28, 29);
+}
+
+.switch[type=checkbox]+label {
+    padding-top: 0;
+}
+
+.dropdown-menu {
+    left: auto;
+}
+
+.column {
+    padding: 0rem;
+}
+
+.column.button {
+    display: flex;
+}
+
+.discord-invite {
+    color: white;
+    background-color: #7289DA;
+    border-color: rgb(93, 111, 177);
+}
+
+.discord-invite:hover {
+    color: rgb(228, 228, 228);
+    background-color: rgb(93, 111, 177);
+    border-color: rgb(78, 93, 148);
+}
+
+.twitter-invite {
+    color: white;
+    background-color: #38A1F3;
+    border-color: rgb(49, 141, 212);
+}
+
+.twitter-invite:hover {
+    color: rgb(228, 228, 228);
+    background-color: rgb(49, 141, 212);
+    border-color: rgb(42, 120, 180);
+}
+
+.twitch-invite {
+    color: white;
+    background-color: rgb(100, 65, 164);
+    border-color: rgb(81, 52, 134);
+}
+
+.twitch-invite:hover {
+    color: rgb(228, 228, 228);
+    background-color: rgb(81, 52, 134);
+    border-color: rgb(71, 46, 117);
+}
+
+.subtitle {
+    padding-top: 1rem;
+}
+
+.subtitle:not(:last-child) {
+    margin-bottom: 1rem;
+}
+
+.checkbox {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.after-checkbox {
+    padding-top: 0;
+}
+
+@media screen and (min-width: 1024px) {
+
+    .navbar-link.is-active,
+    a.navbar-item.is-active {
+        color: #3273dc;
+        background-color: transparent;
+    }
+
+    .navbar-link.is-active:not(:focus):not(:hover),
+    a.navbar-item.is-active:not(:focus):not(:hover) {
+        background-color: #fafafa;
+    }
+}

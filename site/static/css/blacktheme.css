@@ -1,0 +1,23 @@
+html,
+body {
+    background: #23272A;
+}
+
+.title,
+.subtitle strong {
+    color: #f1f1f1;
+}
+
+.subtitle {
+    color: #d1d1d1;
+}
+
+@media screen and (min-width: 1024px) {
+    .navbar-dropdown {
+        background-color: #363636;
+    }
+
+    .navbar-item {
+        color: #d1d1d1;
+    }
+}

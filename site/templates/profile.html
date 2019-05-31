@@ -1,0 +1,67 @@
+{% extends 'base.html'%}
+
+{% block title %}
+Profil de {{username}}
+{% endblock title %}
+
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        {% if confirm_bot_added == True %}
+        <div class="notification is-success">
+            <button class="delete"></button>
+            Bravo ! SociaBot est maintenant disponible sur votre serveur !
+            Allez voir les différents onglets pour le configurer.
+        </div>
+        {% endif %}
+        <div class="columns">
+            <div class="column is-one-fifth"></div>
+            <h1 class="title column">
+                Bienvenue dans l'assistant de configuration de SociaBot {{username}} !
+            </h1>
+        </div>
+        <div class="level">
+            <a class="level-item has-text-centered button discord-invite"
+                href="https://discordapp.com/oauth2/authorize?client_id=575402830593261578&scope=bot&permissions=8&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5000%2Fbot-server-added">
+                Inviter SociaBot sur votre serveur
+            </a>
+        </div>
+        <div class="level">
+            <div class="level-item has-text-centered subtitle">
+                Exclure SociaBot du serveur :
+            </div>
+            <div class="dropdown level-item has-text-centered" id="owned-guilds">
+                <div class="dropdown-trigger">
+                    <button onclick="toggleDropdown(this);" class="button" aria-haspopup="true"
+                        aria-controls="dropdown-menu">
+                        <span id="item-selected">Selectionnez un serveur</span>
+                        <span class="icon is-small">
+                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                        </span>
+                    </button>
+                </div>
+                <div class="dropdown-menu" id="owned_guild_dropdown" role="select">
+                    <div class="dropdown-content">
+                        {% for i in range(bot_owned_guilds|length) %}
+                        <a onclick="contentSelect(this,{{i}},'exclude')" class="dropdown-item">
+                            {{bot_owned_guilds[i].server_name}}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <a class="level-item has-text-centered button" href="#">
+                Exclure
+            </a>
+        </div>
+    </div>
+</section>
+<script>
+    function botExcludeUrl(el, serv) {
+        el.href =
+            "{{url_for('invite_bot_to', server_name="")}}" + encodeURIComponent(serv.trim())
+    }
+</script>
+<script src="{{ url_for('static', filename='js/base.js') }}"></script>
+{% endblock content %}

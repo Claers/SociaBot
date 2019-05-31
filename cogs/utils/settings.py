@@ -1,7 +1,11 @@
 import os
 
-DiscordToken = os.environ.get("discord_token")
-TwitterKey = os.environ.get("twitter_key")
-TwitterSecret = os.environ.get("twitter_secret")
+discord_token = os.environ.get("discord_token")
+twitter_key = os.environ.get("twitter_key")
+twitter_secret = os.environ.get("twitter_secret")
+discord_client_id = os.environ.get("discord_client_id")
+discord_client_secret = os.environ.get("discord_client_secret")
+twitch_client_id = os.environ.get("twitch_client_id")
+twitch_client_secret = os.environ.get("twitch_client_secret")
 BOT_PREFIX = ("!")
 DATABASE_URI = 'postgres+psycopg2://sociabotuser:sociabot123@127.0.0.1:5432/sociabot'

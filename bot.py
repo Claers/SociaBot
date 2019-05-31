@@ -34,18 +34,28 @@ async def on_ready():
             serv = models.Server(
                 server_id=str(guild.id),
                 server_name=guild.name,
-                admin_id=str(guild.owner.id),
+                discord_admin_id=str(guild.owner.id),
                 admin_name=guild.owner.name
             )
             models.session.add(serv)
+            models.session.flush()
+            admin = models.session.query(models.User).filter(
+                models.User.discord_user_id == serv.discord_admin_id
+            ).first()
+            if admin is not None:
+                serv.admin_id = admin.id
+                models.session.flush()
             models.session.commit()
 
 
 @client.event
 async def on_guild_join(guild):
-    serv = models.Server(server_id=str(guild.id), server_name=guild.name,
-                         admin_id=str(guild.owner.id),
-                         admin_name=guild.owner.name)
+    serv = models.Server(
+        server_id=str(guild.id),
+        server_name=guild.name,
+        discord_admin_id=str(guild.owner.id),
+        admin_name=guild.owner.name
+    )
     models.session.add(serv)
     models.session.commit()
 
@@ -72,13 +82,6 @@ async def on_command_error(ctx, error):
     else:
         print(error)
 
-clientid = "myclientid"
-url = 'https://api.twitch.tv/helix/webhook/hub'
-payload = {
-    "hub.mode": "subscribe",
-    "hub.topic": "https://api.twitch.tv/helix/streams?user_id=162917759",
-    "hub.lease_seconds": 864000
-}
 
 if __name__ == '__main__':
     for extension in extensions:

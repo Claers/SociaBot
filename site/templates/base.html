@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>SociaBot - Beta - {% block title %}{% endblock title %}</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/SociaBotIco.png') }}" />
+
+    <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='bulma/css/bulma.css') }}">
+    
+    <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+
+    {% if black_theme %}
+    <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='css/blacktheme.css') }}">
+    {% else %}
+    <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='css/whitetheme.css') }}">
+    {% endif %}
+</head>
+
+<body>
+    <nav class="navbar {% if black_theme %} is-dark {%endif%}" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='img/logosite.png')}}" width="130">
+            </a>
+
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false"
+                data-target="siteNavbar">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="siteNavbar" class="navbar-menu">
+            <div class="navbar-start">
+
+                <a class="navbar-item {% block twitter_active %} {% endblock %}" href="{{ url_for('twitter') }}">
+                    Twitter
+                </a>
+
+                <a class="navbar-item">
+                    Facebook
+                </a>
+
+                <a class="navbar-item {% block twitch_active %} {% endblock %}" href="{{ url_for('twitch') }}">
+                    Twitch
+                </a>
+                <!--
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        More
+                    </a>
+
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item">
+                            About
+                        </a>
+                        <a class="navbar-item">
+                            Jobs
+                        </a>
+                        <a class="navbar-item">
+                            Contact
+                        </a>
+                        <hr class="navbar-divider">
+                        <a class="navbar-item">
+                            Report an issue
+                        </a>
+                    </div>
+                </div>
+                -->
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <input id="darktheme" class="checkbox" type="checkbox" name="darktheme" class="switch is-dark" {% if black_theme %}
+                        checked="checked" {% endif %} onclick="
+                        location.href='{{ url_for('black_theme', enabled=black_theme, actualUrl=quote_plus(request.url)) }}'
+                        ">
+                    <label for="darktheme">
+                        Thème Sombre</label>
+                </div>
+                {% if session['discord_token'] %}
+                <div class="navbar-item has-dropdown is-hoverable user-avatar">
+                    <a class="navbar-link">
+                        <figure class="image is-48x48">
+                            <img class="is-rounded" src="{{avatar_url}}">
+                        </figure>
+                    </a>
+                    <div class="navbar-dropdown is-right">
+                        <a class="navbar-item" href="{{ url_for('profile') }}">
+                            Profile
+                        </a>
+                        <a class="navbar-item">
+                            About
+                        </a>
+                        <hr class="navbar-divider">
+                        <a class="navbar-item">
+                            Log Out
+                        </a>
+                    </div>
+
+                </div>
+                {% else %}
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a class="button is-light">
+                            Log in
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}
+
+    {% endblock content %}
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Get all "navbar-burger" elements
+        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+        // Check if there are any navbar burgers
+        if ($navbarBurgers.length > 0) {
+
+            // Add a click event on each of them
+            $navbarBurgers.forEach(el => {
+                el.addEventListener('click', () => {
+
+                    // Get the target from the "data-target" attribute
+                    const target = el.dataset.target;
+                    const $target = document.getElementById(target);
+
+                    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                    el.classList.toggle('is-active');
+                    $target.classList.toggle('is-active');
+
+                });
+            });
+        }
+
+    });
+</script>
+<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+</html>
