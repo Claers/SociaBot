@@ -1,3 +1,4 @@
+import json
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, DateTime
@@ -31,10 +32,8 @@ class User(Base):
     discord_user_id = Column(String)
     discord_guild_ids = relationship("Server", secondary=server_user_table)
     dark_theme_enabled = Column(Boolean)
-    user_twitter_account = Column(Integer, ForeignKey("twitter_account.id"))
-    twitter_account_id = relationship(
-        "TwitterAccount", foreign_keys=[user_twitter_account])
-    twitch_account_id = relationship("TwitchAccount")
+    twitter_account_id = Column(Integer, ForeignKey("twitter_account.id"))
+    twitch_account_id = Column(Integer, ForeignKey("twitch_account.id"))
     language = Column(String)
 
 
@@ -47,9 +46,10 @@ class Server(Base):
     users_id = relationship("User", secondary=server_user_table)
     admin_id = Column(Integer, ForeignKey("user.id"))
     admin_name = Column(String)
-    twitch_notification_activated = relationship(
-        "TwitchAccount", secondary=twitch_server_table)
+    twitch_account_linked = Column(Integer, ForeignKey("twitch_account.id"))
     twitter_account_linked = Column(Integer, ForeignKey("twitter_account.id"))
+    twitter_notification_enabled = Column(Boolean)
+    twitch_notification_enabled = Column(Boolean)
 
     def __repr__(self):
         return "<Server(id='{}', server_name='{}', admin_name='{}')>".format(
@@ -64,12 +64,19 @@ class TwitterAccount(Base):
     access_token = Column(String)
     access_secret = Column(String)
     account_user_id = Column(String)
-    notification_enabled = Column(Boolean)
 
     def __repr__(self):
-        return "<TWAccount(id='{}', server_id='{}', admin_id='{}')>".format(
-            self.id, self.server_id, self.admin_id,
-            self.access_token, self.access_secret)
+        return "<TWAccount(id='{}', user_id='{}', name='{}')>".format(
+            self.id, self.account_user_id, self.twitter_name)
+
+    def _json(self):
+        return json.dumps({
+            'user_id': self.user_id,
+            'twitter_name': self.twitter_name,
+            'access_token': self.access_token,
+            'access_secret': self.access_secret,
+            'account_user_id': self.account_user_id
+        })
 
 
 class Tweet(Base):
@@ -105,8 +112,6 @@ class TwitchAccount(Base):
     twitch_id = Column(String)
     access_token = Column(String)
     refresh_token = Column(String)
-    notification_activated_on = relationship(
-        "Server", secondary=twitch_server_table)
 
 
 Base.metadata.create_all(engine)

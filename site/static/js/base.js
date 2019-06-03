@@ -2,14 +2,11 @@ function toggleDropdown(el) {
     el.parentElement.parentElement.classList.toggle("is-active");
 }
 
-function contentSelect(el, i, type) {
+function contentSelect(el, type) {
     el.parentElement.parentElement.parentElement.children[0].children[0].children[0].innerHTML = el.innerHTML
         .trim();
     if (type == "exclude") {
         botExcludeUrl(el.parentElement.parentElement.parentElement.parentElement.children[2], el.innerHTML);
-    }
-    if (type == "twitter_use_account") {
-
     }
     toggleDropdown(el.parentElement);
 }
@@ -24,6 +21,7 @@ function sendJsonData() {
     console.log(twitter.children[0].children);
     for (i = 0; i < twitter.children[0].children.length; i++) {
         server_id = server[i].className.split(' ')[1];
+        print(server[i].children[1].children[1].children[0])
     }
 }
 

@@ -51,11 +51,13 @@ Twitter
                         </div>
                         <div class="dropdown-menu twitter_account_dropdown" id="use_account_dropdown" role="select">
                             <div class="dropdown-content">
-                                <a onclick="twitter_account_id = 'None'" class="dropdown-item">
+                                <a onclick="twitter_account_id = 'None'; contentSelect(this, '');"
+                                    class="dropdown-item">
                                     None
                                 </a>
                                 {% for i in range(twitter_accounts|length) %}
-                                <a onclick="twitter_account_id = '{{ twitter_accounts[i][3] }}'" class="dropdown-item">
+                                <a onclick="twitter_account_id = '{{ twitter_accounts[i][3] }}'; contentSelect(this, '');"
+                                    class="dropdown-item">
                                     {{twitter_accounts[i][2]}}
                                 </a>
                                 {% endfor %}
@@ -88,4 +90,8 @@ Twitter
     </div>
 </section>
 <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+<script>
+    var data = '{{ twitter_accounts }}'
+    console.log(data)
+</script>
 {% endblock content %}

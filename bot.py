@@ -86,4 +86,4 @@ async def on_command_error(ctx, error):
 if __name__ == '__main__':
     for extension in extensions:
         client.load_extension(extension)
-    client.run(settings.DiscordToken)
+    client.run(settings.discord_token)

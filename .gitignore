@@ -61,3 +61,4 @@ target/
 
 \.vscode/
 .pytest_cache/
+cogs/utils/versions/

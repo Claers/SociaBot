@@ -166,28 +166,30 @@ def get_discord_user(discord):
     # get user object from DataBase
     existing_user = models.session.query(models.User).filter(
         models.User.discord_user_id == user_id).first()
+    twitter_accounts = models.session.query(models.TwitterAccount).filter(
+        models.TwitterAccount.user_id == existing_user.id
+    ).all()
     # store user infos into session
     session['user_id'] = existing_user.id
     session['black_theme'] = existing_user.dark_theme_enabled
-    if len(existing_user.twitter_account_id) > 0:
-        twitter_accounts = []
-        for twitter_account in existing_user.twitter_account_id:
+    if twitter_accounts is not None:
+        twitter_accounts_cred = []
+        for twitter_account in twitter_accounts:
             creditentials = []
             creditentials.append(twitter_account.access_token)
             creditentials.append(twitter_account.access_secret)
             creditentials.append(twitter_account.twitter_name)
             creditentials.append(twitter_account.id)
-            twitter_accounts.append(creditentials)
-        session['twitter_accounts'] = twitter_accounts
-    if len(existing_user.twitch_account_id) > 0:
+            twitter_accounts_cred.append(creditentials)
+        session['twitter_accounts'] = twitter_accounts_cred
+    if existing_user.twitch_account_id is not None:
         twitch_account = []
-        for twitch_account in existing_user.twitch_account_id:
-            creditentials = []
-            creditentials.append(twitch_account.twitch_access_token)
-            creditentials.append(twitch_account.twitchaccess_secret)
-            creditentials.append(twitch_account.twitch_name)
-            creditentials.append(twitch_account.id)
-            twitch_account.append(creditentials)
+        creditentials = []
+        creditentials.append(twitch_account.twitch_access_token)
+        creditentials.append(twitch_account.twitchaccess_secret)
+        creditentials.append(twitch_account.twitch_name)
+        creditentials.append(twitch_account.id)
+        twitch_account.append(creditentials)
         session['twitch_accounts'] = twitch_account
 
 
@@ -317,8 +319,6 @@ def add_twitter_account(existing_user, username, token, secret, user_id):
     )
     models.session.add(twitter_account)
     models.session.flush()
-    existing_user.twitter_account_id.append(twitter_account)
-    models.session.flush()
     models.session.commit()
 
 
@@ -327,13 +327,16 @@ def add_twitter_account(existing_user, username, token, secret, user_id):
 def twitter():
     discord = OAuth2Session(client_id, token=session['discord_token'])
     user_info = user_infos(discord)
+    get_discord_user(discord)
     resource = twitter_get_resource_token()
     session['ro_key'] = resource[0]
     session['ro_secret'] = resource[1]
     avatar = discord.get(discord_cdn + 'avatars/' +
                          user_info['id'] + '/' + user_info['avatar'] + '.png')
-    twitter_accounts = session.get('twitter_accounts')
-    print(twitter_accounts)
+    twitter_accounts = models.session.query(models.TwitterAccount).filter(
+        models.TwitterAccount.user_id == session['user_id']
+    ).all()
+    print(twitter_accounts[0]._json())
     bot_user_guilds = models.session.query(models.Server).filter(
         models.Server.users_id.any(models.User.id == str(session['user_id']))).all()
     if session.get("twitter_account_added") is not None:
@@ -370,7 +373,7 @@ def oauth_callback_twitter():
     discord = OAuth2Session(client_id, token=session['discord_token'])
     db_user_id = str(session['user_id'])
     existing_user = models.session.query(models.User).filter(
-        models.User.discord_user_id == db_user_id).first()
+        models.User.id == db_user_id).first()
     account = models.session.query(models.TwitterAccount).filter(
         models.TwitterAccount.account_user_id == user_id
     ).first()
@@ -386,11 +389,11 @@ def oauth_callback_twitter():
 
 @app.route('/twitter_update_infos/')
 @login_required
-def twitter_update_infos(server_id):
+def twitter_update_infos():
     data = request.get_json()
-    twitter_accounts = models.session.query(models.User).filter(
-        models.User.discord_user_id == str(session['user_id'])
-    ).first().twitter_account_id
+    twitter_accounts = models.session.query(models.TwitterAccount).filter(
+        models.TwitterAccount.user_id == str(session['user_id'])
+    ).all()
     for twitter_account in twitter_accounts:
         print(data[twitter_account.account_user_id])
     return redirect(url_for('twitter'))
@@ -506,7 +509,7 @@ def oauth_callback_twitch():
     user_id = str(session['user_id'])
     twitch_user_info = get_twitch_infos(twitch)
     existing_user = models.session.query(models.User).filter(
-        models.User.discord_user_id == user_id).first()
+        models.User.id == user_id).first()
     account = models.session.query(models.TwitchAccount).filter(
         models.TwitchAccount.twitch_id == twitch_user_info['id']
     ).first()
