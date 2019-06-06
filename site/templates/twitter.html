@@ -19,6 +19,12 @@ Twitter
             Ce compte twitter est déja enregistré !
         </div>
         {% endif %}
+        {% if tw_updated == True %}
+        <div class="notification is-success">
+            <button class="delete"></button>
+            Les informations ont bien été enregistrées ! 
+        </div>
+        {% endif %}
         <div class="columns">
             <div class="column is-one-fifth"></div>
             <h1 class="title column">
@@ -51,14 +57,14 @@ Twitter
                         </div>
                         <div class="dropdown-menu twitter_account_dropdown" id="use_account_dropdown" role="select">
                             <div class="dropdown-content">
-                                <a onclick="twitter_account_id = 'None'; contentSelect(this, '');"
+                                <a onclick="twitter_account_id = 'None'; contentSelect(this, 'unselect');"
                                     class="dropdown-item">
                                     None
                                 </a>
                                 {% for i in range(twitter_accounts|length) %}
-                                <a onclick="twitter_account_id = '{{ twitter_accounts[i][3] }}'; contentSelect(this, '');"
+                                <a onclick="twitter_account_id = '{{ twitter_accounts[i]['id'] }}'; contentSelect(this, 'twitter');"
                                     class="dropdown-item">
-                                    {{twitter_accounts[i][2]}}
+                                    {{twitter_accounts[i]['twitter_name']}}
                                 </a>
                                 {% endfor %}
                             </div>
@@ -70,12 +76,9 @@ Twitter
                     <div class="level-item">
                         <label class="subtitle" for="notif">
                             Notification :</label>
-                        <input class="checkbox" id="notifs" type="checkbox" name="notifs" class="switch is-success"
-                            {% if owned_guild in twitter_accounts.notification_activated_on %} checked="checked"
-                            {% endif %} onclick="location.href=''">
+                        <input class="checkbox" id="notifs" type="checkbox" name="notifs" class="switch is-success" disabled>
                         <label class="subtitle after-checkbox"
-                            for="notif">{% if owned_guild in twitter_accounts.notification_activated_on %}
-                            Activé {% else %} Désactivé {% endif %}</label>
+                            for="notif">Désactivé</label>
                     </div>
                 </div>
             </div>
@@ -89,9 +92,10 @@ Twitter
         </div>
     </div>
 </section>
-<script src="{{ url_for('static', filename='js/base.js') }}"></script>
 <script>
-    var data = '{{ twitter_accounts }}'
-    console.log(data)
+    var twitter = document.getElementById('twitter');
+    var servers = twitter.children[0].children;
+    var bot_user_guilds = JSON.parse('{{ bot_user_guilds | tojson | safe }}');
 </script>
+<script src="{{ url_for('static', filename='js/base.js') }}"></script>
 {% endblock content %}

@@ -25,15 +25,23 @@ Twitch
                 Bienvenue dans l'assistant de configuration de SociaBot {{username}} !
             </h1>
         </div>
+        {% if twitch_account is none %}
         <div class="level">
             <a class="level-item has-text-centered button twitch-invite" href="{{twitch_login_url}}">
                 Connecter votre compte Twitch
             </a>
         </div>
-        {% if twitch_accounts is not none %}
+        {% else %}
+        <div class="level">
+            <a class="level-item has-text-centered button twitch-invite" href="{{twitch_login_url}}">
+                Connecter un autre compte Twitch
+            </a>
+        </div>
         <div class="level">
             <h3 class="title level-item has-text-centered">
-                Activer les notifs de live sur :
+                Activer les notifs de live pour&nbsp;
+                <a href="https://www.twitch.tv/{{twitch_account['login']}}">{{twitch_account['display_name']}}</a>
+                &nbsp;sur :
             </h3>
         </div>
         {% for owned_guild in owned_guilds %}
@@ -43,9 +51,9 @@ Twitch
             </p>
             <div class="level-item ">
                 <input id="notifs" class="checkbox" type="checkbox" name="notifs" class="switch is-success"
-                    {% if owned_guild in twitch_account.notification_activated_on %} checked="checked" {% endif %}
+                    {% if owned_guild.twitch_notification_enabled %} checked="checked" {% endif %}
                     onclick="location.href='{{ url_for('twitch_notif', server=owned_guild.id) }}'">
-                <label class="subtitle after-checkbox" for="notif">{% if owned_guild in twitch_account.notification_activated_on %}
+                <label class="subtitle after-checkbox" for="notif">{% if owned_guild.twitch_notification_enabled %}
                     Activé {% else %} Désactivé {% endif %}</label>
             </div>
         </div>

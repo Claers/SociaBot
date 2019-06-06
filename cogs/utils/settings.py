@@ -8,4 +8,4 @@ discord_client_secret = os.environ.get("discord_client_secret")
 twitch_client_id = os.environ.get("twitch_client_id")
 twitch_client_secret = os.environ.get("twitch_client_secret")
 BOT_PREFIX = ("!")
-DATABASE_URI = 'postgres+psycopg2://sociabotuser:sociabot123@127.0.0.1:5432/sociabot'
+DATABASE_URI = os.environ.get("db_uri")

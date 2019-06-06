@@ -18,13 +18,6 @@ server_user_table = Table('server_user', Base.metadata,
                           Column('user_id', Integer, ForeignKey("user.id"))
                           )
 
-twitch_server_table = Table('twitch_server', Base.metadata,
-                            Column('twitch_id', Integer,
-                                   ForeignKey("twitch_account.id")),
-                            Column('server_id', Integer,
-                                   ForeignKey("server.id"))
-                            )
-
 
 class User(Base):
     __tablename__ = "user"
@@ -55,6 +48,15 @@ class Server(Base):
         return "<Server(id='{}', server_name='{}', admin_name='{}')>".format(
             self.id, self.server_name, self.admin_name)
 
+    def _json(self):
+        return {
+            'id': self.id,
+            'server_id': self.server_id,
+            'server_name': self.server_name,
+            'twitter_notification_enabled': self.twitter_notification_enabled,
+            'twitch_notification_enabled': self.twitch_notification_enabled
+        }
+
 
 class TwitterAccount(Base):
     __tablename__ = "twitter_account"
@@ -70,13 +72,14 @@ class TwitterAccount(Base):
             self.id, self.account_user_id, self.twitter_name)
 
     def _json(self):
-        return json.dumps({
+        return {
+            'id': self.id,
             'user_id': self.user_id,
             'twitter_name': self.twitter_name,
             'access_token': self.access_token,
             'access_secret': self.access_secret,
             'account_user_id': self.account_user_id
-        })
+        }
 
 
 class Tweet(Base):

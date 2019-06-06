@@ -40,16 +40,17 @@ class Twitter(Cog):
         """Load all twitter account configured in the database into a list of
         tweepy objects
         """
-        accounts = models.session.query(models.TwitterAccount).all()
-        for taccount in accounts:
-            server_id = models.session.query(
-                models.Server).get(
-                    taccount.server_id).server_id
+        servers = models.session.query(models.Server).all()
+        for server in servers:
+            server_id = server.server_id
             self.account[server_id] = tweepy.OAuthHandler(
-                settings.TwitterKey,
-                settings.TwitterSecret, 'oob')
-            self.account[server_id] .set_access_token(
-                taccount.access_token, taccount.access_secret)
+                settings.twitter_key,
+                settings.twitter_secret, 'oob')
+            tw_account = models.session.query(models.TwitterAccount).filter(
+                models.TwitterAccount.id == server.twitter_account_linked
+            ).first()
+            self.account[server_id].set_access_token(
+                tw_account.access_token, tw_account.access_secret)
             api = tweepy.API(self.account[server_id])
             id = api.me().id_str
             self.streamListener[server_id] = MyStreamListener(
@@ -71,16 +72,19 @@ class Twitter(Cog):
             if channel.name == "twitter":
                 await channel.send(tweet)
 
+    async def test(self):
+        return True
+
     @commands.command()
     @checks.is_server()
     async def tweet(self, ctx):
+        print("here")
         tweet = ctx.message.clean_content.replace(
             '!tweet', '{0} :'.format(ctx.author.name))
         api = tweepy.API(self.account[str(ctx.guild.id)])
         username = api.me().name
         server = models.session.query(models.Server).filter(
             models.Server.server_id == str(ctx.guild.id)).first()
-        print(server)
         tweet_object_content = {}
         tweet_object_content['tweet'] = tweet
         tweet_object_content['account_id'] = server.twitter_account_id
