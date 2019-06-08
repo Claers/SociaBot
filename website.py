@@ -153,6 +153,8 @@ def oauth_callback_discord():
         models.User.discord_user_id == user_id).first()
     if existing_user is None:
         discord_func.new_discord_user()
+        # create data into the session
+        get_user(discord)
     else:
         get_user(discord)
     return redirect(url_for('index'))

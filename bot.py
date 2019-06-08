@@ -67,17 +67,20 @@ async def on_raw_reaction_add(payload):
 
 @client.event
 async def on_command_error(ctx, error):
-    print("error")
     if type(error) == CheckFailure:
+        user = models.session.query(models.User).filter(
+            models.User.discord_user_id == str(ctx.author.id)
+        ).first()
+        lang.set_actual_lang_for_user(user, "FR")
         if(ctx.message.content == "is_private"):
             await ctx.send('\N{NO ENTRY} ' +
-                           lang.ACTUAL['is_private_error'][0]
+                           lang.return_string(user, 'is_private_error')
                            + ' \N{NO ENTRY} ')
             await ctx.message.author.send(
-                lang.ACTUAL['is_private_error'][1])
+                lang.lang.return_string(user, 'is_private_error', 1))
         if(ctx.message.content == "is_server"):
             await ctx.send('\N{NO ENTRY} ' +
-                           lang.ACTUAL['is_server_error']
+                           lang.return_string(user, 'is_server_error')
                            + ' \N{NO ENTRY} ')
     else:
         print(error)

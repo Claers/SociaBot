@@ -3,7 +3,6 @@ from flask import request, session, redirect, url_for
 
 import cogs.utils.models as models
 import cogs.utils.settings as settings
-import website
 
 base_discord_api_url = 'https://discordapp.com/api'
 discord_cdn = "https://cdn.discordapp.com/"
@@ -110,5 +109,4 @@ def new_discord_user():
         user.discord_guild_ids.append(discord_guild)
     models.session.flush()
     models.session.commit()
-    # create data into the session
-    website.get_user(discord)
+    

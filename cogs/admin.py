@@ -1,5 +1,6 @@
 import inspect
 import sys
+import asyncio
 from discord.ext import commands
 from .utils import checks
 from discord.ext.commands import Cog
@@ -52,8 +53,14 @@ class Admin(Cog):
     @checks.is_owner()
     async def shutdown(self, ctx):
         await ctx.send("G'bye" + '\N{RAISED HAND}')
+        loop = self.bot.loop
+        loop.stop()
+        print(loop)
         await self.bot.close()
         sys.exit()
+        pending = asyncio.Task.all_tasks()
+        print(pending)
+        loop.run_until_complete(asyncio.gather(*pending))
 
     @commands.command(pass_context=True, hidden=True)
     @checks.is_owner()

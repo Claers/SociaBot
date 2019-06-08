@@ -43,13 +43,6 @@ def mock_oauth2_get(url):
     return resp
 
 
-def mock_get_user(discord):
-    """Mock the website.get_user
-    Used just for ignore function
-    """
-    pass
-
-
 class TestDiscordUtilsFunctions(TestCase):
     """Tests for the discord functions contained in utils/discord_functions.py
     These functions are used in the website for authentification and other
@@ -103,9 +96,7 @@ class TestDiscordUtilsFunctions(TestCase):
                 side_effect=mock_oauth2_get)
     @mock.patch('utils.discord_functions.user_infos',
                 side_effect=mock_user_infos)
-    @mock.patch('website.get_user',
-                side_effect=mock_get_user)
-    def test_new_discord_user(self, oauth2_get, user_infos, get_user):
+    def test_new_discord_user(self, oauth2_get, user_infos):
         """Test the new_discord_user function
         This function is used to put data into database and to make the link
         between user_guilds and Server stored in database

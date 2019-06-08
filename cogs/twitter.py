@@ -8,7 +8,6 @@ import asyncio
 import base64
 import math
 from requests_oauthlib import OAuth1
-import discord
 
 from discord.ext.commands import Cog
 from discord.ext import commands
@@ -49,16 +48,17 @@ class Twitter(Cog):
             tw_account = models.session.query(models.TwitterAccount).filter(
                 models.TwitterAccount.id == server.twitter_account_linked
             ).first()
-            self.account[server_id].set_access_token(
-                tw_account.access_token, tw_account.access_secret)
-            api = tweepy.API(self.account[server_id])
-            id = api.me().id_str
-            self.streamListener[server_id] = MyStreamListener(
-                server_id, self.bot, api)
-            self.stream[server_id] = tweepy.Stream(
-                auth=api.auth,
-                listener=self.streamListener[server_id])
-            self.stream[server_id].filter(follow=[id], is_async=True)
+            if tw_account is not None:
+                self.account[server_id].set_access_token(
+                    tw_account.access_token, tw_account.access_secret)
+                api = tweepy.API(self.account[server_id])
+                id = api.me().id_str
+                self.streamListener[server_id] = MyStreamListener(
+                    server_id, self.bot, api)
+                self.stream[server_id] = tweepy.Stream(
+                    auth=api.auth,
+                    listener=self.streamListener[server_id])
+                self.stream[server_id].filter(follow=[id], is_async=True)
 
     def loop_handle(self, tweet, server_id):
         loop = self.bot.loop
@@ -71,41 +71,6 @@ class Twitter(Cog):
         for channel in guild.channels:
             if channel.name == "twitter":
                 await channel.send(tweet)
-
-    async def test(self):
-        return True
-
-    @commands.command()
-    @checks.is_server()
-    async def tweet(self, ctx):
-        print("here")
-        tweet = ctx.message.clean_content.replace(
-            '!tweet', '{0} :'.format(ctx.author.name))
-        api = tweepy.API(self.account[str(ctx.guild.id)])
-        username = api.me().name
-        server = models.session.query(models.Server).filter(
-            models.Server.server_id == str(ctx.guild.id)).first()
-        tweet_object_content = {}
-        tweet_object_content['tweet'] = tweet
-        tweet_object_content['account_id'] = server.twitter_account_id
-        if len(ctx.message.attachments) == 1:
-            tweet_object_content = await self.__tweet_with_media_logic(
-                ctx, tweet, api, username, server, tweet_object_content
-            )
-        elif len(ctx.message.attachments) > 1:
-            tweet_object_content = await self.__tweet_with_multiple_media(
-                ctx, tweet, api, username, server, tweet_object_content
-            )
-        else:
-            tweet_object_content = await self.__tweet_without_media(
-                ctx, tweet, api, username, server, tweet_object_content
-            )
-        await self.__send_tweet_object(tweet_object_content)
-        await ctx.send(
-            "Bravo {0} ! Votre tweet a été envoyé : ".format(
-                ctx.author.name)
-            + tweet_object_content['tweet_url'])
-        await ctx.message.delete()
 
     async def __send_tweet_object(self, tweet_object_content):
         tweet_object = models.Tweet(
@@ -246,80 +211,77 @@ class Twitter(Cog):
                       self.account[str(ctx.guild.id)].access_token,
                       self.account[str(ctx.guild.id)].access_token_secret
                       )
-        if(content_type == "image"):
-            response = requests.post(
+        response = requests.post(
+            url, auth=auth, data={
+                "command": "INIT",
+                "total_bytes": str(len(raw_vid)),
+                "media_type": content_type + "/" + content_extension
+            }
+        )
+        if(media_len_MB < 1):
+            requests.post(
                 url, auth=auth, data={
-                    "media_data": media}
+                    "command": "APPEND",
+                    "media_id": response.json()['media_id_string'],
+                    "media_data": media,
+                    "segment_index": "0"}
             )
-            return response.json()["media_id_string"]
+            await asyncio.sleep(3)
         else:
-            response = requests.post(
-                url, auth=auth, data={
-                    "command": "INIT",
-                    "total_bytes": str(len(raw_vid)),
-                    "media_type": content_type + "/" + content_extension
-                }
-            )
-            if(media_len_MB < 1):
+            for i in range(math.ceil(media_len_MB)):
                 requests.post(
                     url, auth=auth, data={
                         "command": "APPEND",
                         "media_id": response.json()['media_id_string'],
-                        "media_data": media,
-                        "segment_index": "0"}
+                        "media_data": await self.__divide_vid_in_chunk(
+                            i, media
+                        ),
+                        "segment_index": i}
                 )
-                await asyncio.sleep(3)
-            else:
-                for i in range(math.ceil(media_len_MB)):
-                    requests.post(
-                        url, auth=auth, data={
-                            "command": "APPEND",
-                            "media_id": response.json()['media_id_string'],
-                            "media_data": await self.__divide_vid_in_chunk(
-                                i, media
-                            ),
-                            "segment_index": i}
-                    )
-                await asyncio.sleep(5)
-            requests.post(
-                url, auth=auth, data={
-                    "command": "FINALIZE",
-                    "media_id": response.json()['media_id_string'],
-                }
-            )
-            return response.json()["media_id_string"], auth
-
-    async def __tweet_with_multiple_media(
-            self, ctx, tweet, api, username, server):
-        medias_id = []
-        for attachements in ctx.message.attachements:
-            media_id, auth = await self.__twitter_post_media(
-                ctx, media_request.content, video,
-                content_type, content_extension
-            )
-            medias_id.append(media_id)
-        url = 'https://api.twitter.com/1.1/statuses/update.json'
-        response = requests.post(
+            await asyncio.sleep(5)
+        requests.post(
             url, auth=auth, data={
-                "status": tweet,
-                "media_ids": medias_id
+                "command": "FINALIZE",
+                "media_id": response.json()['media_id_string'],
             }
         )
-        videos_url = response.json(
-        )['extended_entities']['media'][0]['video_info']['variants']
-        video_url = await self.__get_best_bitrate_video(videos_url)
-        tweet_id = response.json()['id']
-        tweet_url = "https://twitter.com/{0}/status/{1}".format(username,
-                                                                tweet_id)
-        tweet_object_content['tweet_url'] = tweet_url
-        tweet_object_content['media_url'] = video_url
-        return tweet_object_content
+        return response.json()["media_id_string"], auth
 
-    @commands.command(name="deleteTweet")
+    async def tweet_func(self, ctx):
+        tweet = ctx.message.clean_content.replace(
+            '!tweet', '{0} :'.format(ctx.author.name))
+        try:
+            api = tweepy.API(self.account[str(ctx.guild.id)])
+        except KeyError:
+            return await ctx.send("Aucun compte tweeter n'as été configuré !")
+        username = api.me().name
+        server = models.session.query(models.Server).filter(
+            models.Server.server_id == str(ctx.guild.id)).first()
+        tweet_object_content = {}
+        tweet_object_content['tweet'] = tweet
+        tweet_object_content['account_id'] = server.twitter_account_linked
+        if len(ctx.message.attachments) == 1:
+            tweet_object_content = await self.__tweet_with_media_logic(
+                ctx, tweet, api, username, server, tweet_object_content
+            )
+        else:
+            tweet_object_content = await self.__tweet_without_media(
+                ctx, tweet, api, username, server, tweet_object_content
+            )
+        await self.__send_tweet_object(tweet_object_content)
+        await ctx.message.delete()
+        return await ctx.send(
+            "Bravo {0} ! Votre tweet a été envoyé : ".format(
+                ctx.author.name)
+            + tweet_object_content['tweet_url'])
+
+    @commands.command()
     @checks.is_server()
-    @checks.is_server_admin()
-    async def tweet_delete(self, ctx):
-        tweetURL = ctx.message.clean_content.replace('!deleteTweet ', '')
+    async def tweet(self, ctx):
+        await self.tweet_func(ctx)
+
+    async def tweet_delete_func(self, ctx):
+        tweetURL = ctx.message.clean_content.replace('!dTweet ', '')
         tweet_object = models.session.query(
             models.Tweet).filter(models.Tweet.tweet_url ==
                                  tweetURL).first()
@@ -340,10 +302,11 @@ class Twitter(Cog):
             "Bravo {0} ! Votre tweet a été supprimé !".format(ctx.author.name))
         await ctx.message.delete()
 
-
-class SociaBotClient(discord.Client):
-    async def on_reaction_add(self, reaction, user):
-        print(reaction)
+    @commands.command(name="dTweet")
+    @checks.is_server()
+    @checks.is_server_admin()
+    async def tweet_delete(self, ctx):
+        await self.tweet_delete_func(ctx)
 
 
 class MyStreamListener(tweepy.StreamListener):
