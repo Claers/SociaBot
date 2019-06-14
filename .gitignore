@@ -63,4 +63,4 @@ target/
 .pytest_cache/
 cogs/utils/versions/
 
-alembic_migration/versions/
+
