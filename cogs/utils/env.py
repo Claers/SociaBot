@@ -1,16 +1,14 @@
-
+import os
+import sys
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
 from alembic import context
-from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy import ForeignKey, Boolean, Table
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy_utils import URLType
-from sqlalchemy.orm import relationship
-from work.SociaBot.SociaBot.cogs.utils.models import Base
+
+sys.path.append(os.getcwd())
+from cogs.utils.models import Base
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

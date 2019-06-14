@@ -2,7 +2,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy import ForeignKey, Boolean, Table
-import work.SociaBot.SociaBot.cogs.utils.settings as settings
+import cogs.utils.settings as settings
 from sqlalchemy_utils import URLType
 from sqlalchemy.orm import sessionmaker, relationship
 

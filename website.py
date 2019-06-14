@@ -172,7 +172,7 @@ def index():
     try:
         user_info = discord_func.user_infos(discord)
     except oauthlib.oauth2.rfc6749.errors.TokenExpiredError:
-        return redirect(url_for('discord'))
+        return redirect(url_for('discord_connection'))
     avatar = discord.get(discord_cdn + 'avatars/' +
                          user_info['id'] + '/' + user_info['avatar'] + '.png')
     return render_template(
