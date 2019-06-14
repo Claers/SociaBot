@@ -1,2 +1,2 @@
-site/static/bulma/* linguist-vendored=false
-site/static/bulma/css/* linguist-vendored=false
+site/static/bulma/* linguist-vendored
+site/static/bulma/css/* linguist-vendored
