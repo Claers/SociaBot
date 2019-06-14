@@ -1,3 +1,5 @@
+import json
+
 from requests_oauthlib import OAuth2Session
 from flask import request, session, redirect
 import requests
@@ -55,8 +57,8 @@ def get_twitch_infos(twitch):
     """
     twitch_login_url = get_twitch_login_url()
     try:
-        twitch_user_info = twitch.get(
-            "https://api.twitch.tv/helix/users").json()['data'][0]
+        twitch_user_info = json.loads(twitch.get(
+            "https://api.twitch.tv/helix/users").text)['data'][0]
         return twitch_user_info
     except (KeyError, TokenExpiredError):
         return redirect(twitch_login_url)

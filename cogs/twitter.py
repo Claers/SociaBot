@@ -5,9 +5,10 @@ from io import BytesIO
 import asyncio
 import base64
 import math
-from requests_oauthlib import OAuth1
+import json
 
 import tweepy
+from requests_oauthlib import OAuth1
 import requests
 from discord.ext.commands import Cog
 from discord.ext import commands
@@ -249,10 +250,11 @@ class Twitter(Cog):
                 "media_ids": [media_id]
             }
         )
-        videos_url = response.json(
-        )['extended_entities']['media'][0]['video_info']['variants']
+        json_data = json.loads(response.text)
+        videos_url = json_data[
+            'extended_entities']['media'][0]['video_info']['variants']
         video_url = self._get_best_bitrate_video(videos_url)
-        tweet_id = response.json()['id']
+        tweet_id = json_data['id']
         tweet_url = "https://twitter.com/{0}/status/{1}".format(username,
                                                                 tweet_id)
         tweet_object_content['tweet_url'] = tweet_url
@@ -321,11 +323,12 @@ class Twitter(Cog):
                 "media_type": content_type + "/" + content_extension
             }
         )
+        json_data = json.loads(response.text)
         if(media_len_MB < 1):
             requests.post(
                 url, auth=auth, data={
                     "command": "APPEND",
-                    "media_id": response.json()['media_id_string'],
+                    "media_id": json_data['media_id_string'],
                     "media_data": media,
                     "segment_index": "0"}
             )
@@ -337,7 +340,7 @@ class Twitter(Cog):
                 requests.post(
                     url, auth=auth, data={
                         "command": "APPEND",
-                        "media_id": response.json()['media_id_string'],
+                        "media_id": json_data['media_id_string'],
                         "media_data": await self._divide_vid_in_chunk(
                             i, media
                         ),
@@ -347,10 +350,10 @@ class Twitter(Cog):
         requests.post(
             url, auth=auth, data={
                 "command": "FINALIZE",
-                "media_id": response.json()['media_id_string'],
+                "media_id": json_data['media_id_string'],
             }
         )
-        return response.json()["media_id_string"], auth
+        return json_data["media_id_string"], auth
 
     async def tweet_func(self, ctx):
         """This function is used when command !tweet [text] is send

@@ -1,3 +1,5 @@
+import json
+
 from requests_oauthlib import OAuth2Session
 from flask import request, session, redirect, url_for
 
@@ -110,8 +112,8 @@ def new_discord_user():
     models.session.flush()
     discord_guilds = []
     # get user connected "guilds" (discord server)
-    user_guilds = discord.get(
-        base_discord_api_url + '/users/@me/guilds').json()
+    user_guilds = json.loads(discord.get(
+        base_discord_api_url + '/users/@me/guilds').text)
     # set user owned guild if guild is in DataBase
     for user_guild in user_guilds:
         guild = models.session.query(models.Server).filter(

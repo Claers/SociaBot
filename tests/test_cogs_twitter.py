@@ -27,7 +27,7 @@ def async_test(f):
     return wrapper
 
 
-class MockBotBase(discord.ext.commands.BotBase):
+class MockBotBase(discord.ext.commands.bot.BotBase):
     """Mock the discord.ext.commands.BotBase class
     Used with discord.Client to make a Bot
     """
@@ -208,6 +208,7 @@ class MockStreamListener(twitter.MyStreamListener):
 
     def __init__(self, server_id, bot, api):
         self.bot = bot
+        self.server_id = server_id
 
 
 def mock_requests_get_video(url, allow_redirects=True):
@@ -363,14 +364,15 @@ class TestCogsTwitter(TestCase):
             server_name="testGuild",
             discord_admin_id="0",
             admin_id=user.id,
-            twitter_account_linked=tw_account.id
+            twitter_account_linked=tw_account.id,
+            twitter_notification_enabled=True
         )
         models.session.add(server)
         models.session.flush()
         # Create Twitter object to access functions
         self.twitter = twitter.Twitter(self.bot)
         # Create fake streamListener object to ignore tweet reception
-        self.streamListener = twitter.MyStreamListener(None, self.bot, None)
+        self.streamListener = twitter.MyStreamListener("0", self.bot, None)
 
     # Unit tests
 
@@ -595,7 +597,7 @@ class TestCogsTwitter(TestCase):
         with mock.patch('tweepy.API',
                         side_effect=MockTweepyAPI):
             message = await self.twitter.get_tweet(tweet, 0)
-            self.assertIn(tweet['tweet_url'], message)
+            self.assertEqual(message, None)
         tweet_db = models.session.query(models.Tweet).filter(
             models.Tweet.tweet_url == tweet['tweet_url']
         ).first()
