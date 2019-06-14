@@ -12,7 +12,6 @@ from requests.models import Response
 
 import utils.discord_functions as discord_funcs
 import cogs.utils.models as models
-import website
 
 
 def mock_oauth_authorization_url(url):

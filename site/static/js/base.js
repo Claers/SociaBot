@@ -28,7 +28,16 @@ function contentSelect(el, type) {
         } else {
             server.children[3].children[1].checked = false;
         }
-        server.children[3].children[1].disabled = false;
+        if (!(channel_id == "None" || channel_id == null)) {
+            server.children[3].children[1].disabled = false;
+        }
+    }
+    if (type == "channel") {
+        var server = el.parentElement.parentElement.parentElement.parentElement;
+        if (!(twitter_account_id == "None" || twitter_account_id == null)) {
+            server.children[3].children[1].disabled = false;
+        }
+
     }
     if (type == "unselect") {
         var server = el.parentElement.parentElement.parentElement.parentElement;
@@ -39,19 +48,30 @@ function contentSelect(el, type) {
     toggleDropdown(el.parentElement);
 }
 
-var twitter_account_id = null;
+function changeText(el) {
+    if (el.checked) {
+        el.parentElement.children[2].innerHTML = "Activé"
+    } else {
+        el.parentElement.children[2].innerHTML = "Désactivé"
+    }
+}
 
-function sendJsonData() {
+var twitter_account_id = null;
+var channel_id = null;
+
+function sendJsonData(el) {
     var i;
     var jsonData = [];
-    var servers = window.servers
+    var servers = window.servers;
+    el.setAttribute("disabled", true);
     for (i = 0; i < servers.length; i++) {
         server_id = servers[i].className.split(' ')[1];
         notif_on = servers[i].children[3].children[1].checked;
         jsonData.push({
             'server_id': server_id,
             'twitter_account_id': twitter_account_id,
-            'notif_on': notif_on
+            'notif_on': notif_on,
+            'notif_id': channel_id
         })
     }
     $.ajax({

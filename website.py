@@ -10,16 +10,18 @@ from flask import Flask
 from flask import session, request, url_for
 from flask import redirect, render_template
 from requests_oauthlib import OAuth2Session
+import oauthlib
 from functools import wraps
 import os
 from urllib.parse import quote_plus, unquote
+import bot
 
 template_dir = os.path.abspath('./site/templates')
 static_dir = os.path.abspath('./site/static')
 app = Flask(
     __name__,
     template_folder=template_dir,
-    static_folder=static_dir
+    static_folder=static_dir,
 )
 
 
@@ -79,6 +81,7 @@ def get_user(discord):
     user_guilds = discord.get(
         base_discord_api_url + '/users/@me/guilds').json()
     # set user owned guild if guild is in DataBase
+    print(user_guilds)
     for user_guild in user_guilds:
         guild = models.session.query(models.Server).filter(
             models.Server.server_id == user_guild['id']).first()
@@ -166,7 +169,10 @@ def index():
     """The home page
     """
     discord = OAuth2Session(client_id, token=session.get('discord_token'))
-    user_info = discord_func.user_infos(discord)
+    try:
+        user_info = discord_func.user_infos(discord)
+    except oauthlib.oauth2.rfc6749.errors.TokenExpiredError:
+        return redirect(url_for('discord'))
     avatar = discord.get(discord_cdn + 'avatars/' +
                          user_info['id'] + '/' + user_info['avatar'] + '.png')
     return render_template(
@@ -196,8 +202,10 @@ def twitter():
     for twitter_account in twitter_accounts:
         twitter_accounts_json.append(twitter_account._json())
     bot_user_guilds = models.session.query(models.Server).filter(
-        models.Server.users_id.any(models.User.id == str(session['user_id']))
+        models.Server.admin_id == str(session['user_id'])
     ).all()
+    channels = discord_func.get_text_channels_for_user(
+        bot_user_guilds)
     bot_user_guilds_json = []
     for bot_user_guild in bot_user_guilds:
         bot_user_guilds_json.append(bot_user_guild._json())
@@ -223,6 +231,7 @@ def twitter():
         avatar_url=avatar.url,
         username=user_info['username'],
         twitter_accounts=twitter_accounts_json,
+        channels=channels,
         bot_user_guilds=bot_user_guilds_json,
         tw_updated=tw_updated,
         confirm_tw_added=confirm_tw_added,
@@ -269,8 +278,10 @@ def twitter_update_infos():
             server = models.session.query(models.Server).filter(
                 models.Server.id == int(server_data['server_id'])
             ).first()
-            server.twitter_account_linked = int(
-                server_data['twitter_account_id'])
+            if not (server_data['twitter_account_id'] == "None" or
+                    server_data['twitter_account_id'] is None):
+                server.twitter_account_linked = int(
+                    server_data['twitter_account_id'])
             server.twitter_notification_enabled = server_data['notif_on']
             models.session.flush()
             models.session.commit()

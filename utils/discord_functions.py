@@ -12,6 +12,7 @@ authorize_url = 'https://discordapp.com/api/oauth2/authorize'
 
 client_id = settings.discord_client_id
 client_secret = settings.discord_client_secret
+bot_token = settings.discord_bot_token
 
 
 def own_guilds(user_guilds):
@@ -72,6 +73,23 @@ def user_infos(discord_auth):
     return user_infos
 
 
+def get_text_channels_for_user(guilds):
+    channels_by_guild = {}
+    for guild in guilds:
+        discord = OAuth2Session(client_id=client_id)
+        headers = {'Authorization': 'Bot %s' % bot_token}
+        guild_channels = discord.get(base_discord_api_url +
+                                     '/guilds/{}/channels'.format(
+                                         guild.server_id
+                                     ), headers=headers).json()
+        text_channels = []
+        for channel in guild_channels:
+            if channel['type'] == 0:
+                text_channels.append(channel)
+        channels_by_guild[guild.server_id] = text_channels
+    return channels_by_guild
+
+
 def new_discord_user():
     """
     Create a user object to be send to DataBase
@@ -109,4 +127,3 @@ def new_discord_user():
         user.discord_guild_ids.append(discord_guild)
     models.session.flush()
     models.session.commit()
-    
