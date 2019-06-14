@@ -61,6 +61,6 @@ target/
 
 \.vscode/
 .pytest_cache/
-static/* linguist-vendored
+site/static/bulma/* linguist-vendored
 
 
