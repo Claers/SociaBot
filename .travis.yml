@@ -1,0 +1,19 @@
+language: python
+python:
+  - "3.7"
+dist: xenial
+sudo: true
+services:
+  - postgresql
+install:
+  - pip install -r requirements.txt
+before_script:
+  - psql -c "CREATE DATABASE sociabot;" -U postgres
+  - psql -c "CREATE USER sociabotuser"
+  - psql -c "ALTER USER sociabotuser WITH PASSWORD 'sociabot123'"
+  - psql -c "GRANT ALL PRIVILEGES ON DATABASE sociabot TO sociabotuser"
+  - psql -c "ALTER USER sociabotuser CREATEDB;"
+script:
+  - alembic revision --autogenerate -m 'init'
+  - alembic upgrade head
+  - python -m unittest discover -s tests
