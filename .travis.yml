@@ -13,6 +13,8 @@ before_script:
   - psql -c "ALTER USER sociabotuser WITH PASSWORD 'sociabot123'"
   - psql -c "GRANT ALL PRIVILEGES ON DATABASE sociabot TO sociabotuser"
   - psql -c "ALTER USER sociabotuser CREATEDB;"
+env:
+  - db_uri=postgres+psycopg2://sociabotuser:sociabot123@127.0.0.1:5432/sociabot
 script:
   - alembic revision --autogenerate -m 'init'
   - alembic upgrade head
