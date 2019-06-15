@@ -84,7 +84,7 @@ def get_user(discord):
     print(user_guilds)
     for user_guild in user_guilds:
         guild = models.session.query(models.Server).filter(
-            models.Server.server_id == user_guild['id']).first()
+            models.Server.server_id == str(user_guild['id'])).first()
         if guild is not None:
             discord_guilds.append(guild)
             guild.users_id.append(existing_user)
