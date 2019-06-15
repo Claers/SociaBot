@@ -327,12 +327,13 @@ def twitch():
         return redirect(twitch_login_url)
 
 
-@app.route('/oauth_callback_twitch/<access_token>')
+@app.route('/oauth_callback_twitch')
 @login_required
-def oauth_callback_twitch(access_token):
+def oauth_callback_twitch():
     """Callback url for twitch authentification
     """
     # token = twitch_func.get_twitch_token_handmade()
+    print(request)
     token = access_token
     """
     twitch = OAuth2Session(
