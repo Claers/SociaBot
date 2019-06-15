@@ -79,7 +79,7 @@ function sendJsonData(el) {
         contentType: 'application/json',
         data: JSON.stringify(jsonData),
         dataType: 'json',
-        url: 'http://localhost:5000/twitter_update_infos/',
+        url: '/twitter_update_infos/',
     });
     setTimeout(function () {
         location.reload();
