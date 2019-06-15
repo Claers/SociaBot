@@ -59,7 +59,7 @@ def get_twitch_login_url_handmade():
     print(state)
     session['state'] = state
     login_url_req = {
-        "response_type": "code",
+        "response_type": "token",
         "client_id": twitch_client_id,
         "redirect_uri": request.host_url + "oauth_callback_twitch",
         "scope": twitch_scope,
@@ -85,6 +85,11 @@ def get_twitch_token_handmade():
             "refresh_token": r.json()['refresh_token']}
 
 
+def get_token_bearer():
+    token = request.url.split('=')[1]
+    return token
+
+
 def twitch_stream_set_webhook(user_id, mode):
     url = 'https://api.twitch.tv/helix/webhooks/hub'
     print(request.host_url +
@@ -99,6 +104,13 @@ def twitch_stream_set_webhook(user_id, mode):
     headers = {"Client-ID": twitch_client_id}
     response = requests.post(url, payload, headers=headers)
     return response.content
+
+
+def twitch_verif_webhook():
+    headers = {"Authorization: Bearer ": session['twitch_token']}
+    url = "https://api.twitch.tv/helix/webhooks/subscriptions"
+    r = requests.get(url, headers=headers)
+    print(r.text)
 
 
 def get_twitch_infos(twitch):

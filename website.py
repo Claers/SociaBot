@@ -297,6 +297,7 @@ def twitter_update_infos():
 def twitch():
     """The twitch configuration page
     """
+    twitch_func.twitch_verif_webhook()
     twitch_login_url = twitch_func.get_twitch_login_url_handmade()
     if session.get('twitch_token') is not None:
         twitch = OAuth2Session(
@@ -331,7 +332,8 @@ def twitch():
 def oauth_callback_twitch():
     """Callback url for twitch authentification
     """
-    token = twitch_func.get_twitch_token_handmade()
+    # token = twitch_func.get_twitch_token_handmade()
+    token = twitch_func.get_token_bearer()
     """
     twitch = OAuth2Session(
         client_id=twitch_func.twitch_client_id,
@@ -398,7 +400,12 @@ def twitch_notif(server):
 
 @app.route('/stream_webhook')
 def twitch_get_stream_notif():
-    print(request.text)
+    print(request)
+    try:
+        print(request.text)
+    except AttributeError:
+        pass
+    return "ok"
 
 
 @app.route("/profile")
