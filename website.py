@@ -85,7 +85,6 @@ def get_user(discord):
     user_guilds = discord.get(
         base_discord_api_url + '/users/@me/guilds').json()
     # set user owned guild if guild is in DataBase
-    print(user_guilds)
     for user_guild in user_guilds:
         guild = models.session.query(models.Server).filter(
             models.Server.server_id == str(user_guild['id'])).first()
@@ -376,11 +375,25 @@ def twitch_notif(server):
     server_obj = models.session.query(models.Server).filter(
         models.Server.id == server
     ).first()
-    server_obj.twitch_notification_enabled = not(
-        server_obj.twitch_notification_enabled)
+    twitch_account = models.session.query(models.TwitchAccount).filter(
+        models.TwitchAccount.id == server_obj.twitch_account_linked
+    ).first()
+    if server_obj.twitch_notification_enabled:
+        server_obj.twitch_notification_enabled = False
+        twitch_func.twitch_stream_set_webhook(
+            twitch_account.twitch_id, "unsubscribe")
+    else:
+        server_obj.twitch_notification_enabled = True
+        twitch_func.twitch_stream_set_webhook(
+            twitch_account.twitch_id, "subscribe")
     models.session.flush()
     models.session.commit()
     return redirect(url_for('twitch'))
+
+
+@app.route('/stream_webhook')
+def twitch_get_stream_notif():
+    print(request.text)
 
 
 @app.route("/profile")
