@@ -2,15 +2,17 @@
 
 {% block content %}
 <script>
-    $.ajax({
-        type: 'POST',
-        contentType: 'application/json',
-        data: document.location.hash,
-        dataType: 'json',
-        url: '/oauth_callback_twitch/',
+    document.addEventListener('DOMContentLoaded', () => {
+        $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            data: document.location.hash,
+            dataType: 'json',
+            url: '/oauth_callback_twitch/',
+        });
+        setTimeout(function () {
+            location.href = "/twitch";
+        }, 500);
     });
-    setTimeout(function () {
-        location.href = "/twitch";
-    }, 500);
 </script>
 {% endblock content %}
