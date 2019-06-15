@@ -107,9 +107,10 @@ def twitch_stream_set_webhook(user_id, mode):
 
 
 def twitch_verif_webhook():
-    headers = {"Authorization: Bearer ": session['twitch_token']}
+    headers = {"Client-ID": twitch_client_id}
     url = "https://api.twitch.tv/helix/webhooks/subscriptions"
     r = requests.get(url, headers=headers)
+    print(r.headers)
     print(r.text)
 
 

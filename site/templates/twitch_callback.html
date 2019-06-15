@@ -5,14 +5,14 @@
     document.addEventListener('DOMContentLoaded', () => {
         $.ajax({
             type: 'POST',
-            contentType: 'application/text',
-            data: document.location.hash,
+            contentType: 'application/json',
+            data: JSON.stringify(document.location.hash),
             dataType: 'json',
             url: '/oauth_callback_twitch',
         });
         setTimeout(function () {
             location.href = "/twitch";
-        }, 500);
+        }, 1500);
     });
 </script>
 {% endblock content %}

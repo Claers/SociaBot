@@ -347,7 +347,9 @@ def oauth_callback_twitch():
     )
     """
     if request.method == "POST":
-        session['twitch_token'] = request.text.split('&')[0].split('=')[1]
+        data = request.json
+        access_token = data.split('&')[0].split('=')[1]
+        session['twitch_token'] = {"access_token": access_token}
         twitch = OAuth2Session(
             twitch_func.twitch_client_id, token=session['twitch_token'])
         user_id = str(session['user_id'])
@@ -363,8 +365,6 @@ def oauth_callback_twitch():
         else:
             account.twitch_access_token = session[
                 'twitch_token']['access_token']
-            account.twitch_refresh_token = session[
-                'twitch_token']['refresh_token']
             models.session.flush()
             models.session.commit()
             session['twitch_account_exist'] = True
@@ -409,7 +409,7 @@ def twitch_get_stream_notif():
         print(request.text)
     except AttributeError:
         pass
-    return "ok"
+    return request.args.get('hub.challenge')
 
 
 @app.route("/profile")
