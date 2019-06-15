@@ -5,7 +5,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         $.ajax({
             type: 'POST',
-            contentType: 'application/json',
+            contentType: 'application/text',
             data: document.location.hash,
             dataType: 'json',
             url: '/oauth_callback_twitch',
