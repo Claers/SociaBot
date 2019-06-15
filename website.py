@@ -334,7 +334,7 @@ def oauth_callback_twitch():
     """
     # token = twitch_func.get_twitch_token_handmade()
     print(request.args.get('access_token'))
-    token = access_token
+    token = request.args.get('access_token')
     """
     twitch = OAuth2Session(
         client_id=twitch_func.twitch_client_id,
