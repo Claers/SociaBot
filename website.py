@@ -333,7 +333,7 @@ def oauth_callback_twitch():
     """Callback url for twitch authentification
     """
     # token = twitch_func.get_twitch_token_handmade()
-    print(request)
+    print(request.args.get('access_token'))
     token = access_token
     """
     twitch = OAuth2Session(

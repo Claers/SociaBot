@@ -70,7 +70,7 @@ def get_twitch_login_url_handmade():
 
 
 def get_twitch_token_handmade():
-    code = parser.urlsplit(request.url).query.split("&")[0].split('=')[1]
+    code = request.agrs.get('code')
     fetch_token_req = {
         "code": code,
         "client_id": twitch_client_id,
