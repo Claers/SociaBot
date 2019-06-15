@@ -327,7 +327,7 @@ def twitch():
         return redirect(twitch_login_url)
 
 
-@app.route('/oauth_callback_twitch')
+@app.route('/oauth_callback_twitch', methods=['POST', 'GET'])
 @login_required
 def oauth_callback_twitch():
     """Callback url for twitch authentification
