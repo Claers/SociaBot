@@ -403,7 +403,7 @@ def twitch_notif(server):
 
 @app.route('/stream_webhook')
 def twitch_get_stream_notif():
-    request.args.get('hub.challenge')
+    print(request.args.get('hub.challenge'))
     try:
         print(request.text)
     except AttributeError:
