@@ -106,14 +106,6 @@ def twitch_stream_set_webhook(user_id, mode):
     return response.content
 
 
-def twitch_verif_webhook():
-    headers = {"Client-ID": twitch_client_id}
-    url = "https://api.twitch.tv/helix/webhooks/subscriptions"
-    r = requests.get(url, headers=headers)
-    print(r.headers)
-    print(r.text)
-
-
 def get_twitch_infos(twitch):
     """
     Get twitch user infos

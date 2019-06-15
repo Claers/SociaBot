@@ -299,7 +299,6 @@ def twitch():
     """
     twitch_login_url = twitch_func.get_twitch_login_url_handmade()
     if session.get('twitch_token') is not None:
-        twitch_func.twitch_verif_webhook()
         twitch = OAuth2Session(
             twitch_func.twitch_client_id, token=session['twitch_token'])
         twitch_user_info = twitch_func.get_twitch_infos(twitch)
