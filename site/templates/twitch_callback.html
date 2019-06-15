@@ -1,3 +1,12 @@
 <script>
-    console.log(document.location.hash)
+    $.ajax({
+        type: 'POST',
+        contentType: 'application/json',
+        data: document.location.hash,
+        dataType: 'json',
+        url: '/oauth_callback_twitch/',
+    });
+    setTimeout(function () {
+        location.href = "/twitch";
+    }, 1000);
 </script>

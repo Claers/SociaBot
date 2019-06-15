@@ -347,7 +347,7 @@ def oauth_callback_twitch():
     )
     """
     if request.method == "POST":
-        session['twitch_token'] = token
+        session['twitch_token'] = request.text.split('&')[0].split('=')[1]
         twitch = OAuth2Session(
             twitch_func.twitch_client_id, token=session['twitch_token'])
         user_id = str(session['user_id'])
