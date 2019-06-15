@@ -1,5 +1,6 @@
 {% extends 'base.html'%}
 
+{% block content %}
 <script>
     $.ajax({
         type: 'POST',
@@ -12,3 +13,4 @@
         location.href = "/twitch";
     }, 500);
 </script>
+{% endblock content %}
