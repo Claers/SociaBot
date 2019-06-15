@@ -401,14 +401,12 @@ def twitch_notif(server):
     return redirect(url_for('twitch'))
 
 
-@app.route('/stream_webhook')
+@app.route('/stream_webhook', methods=['POST', 'GET'])
 def twitch_get_stream_notif():
-    print(request.args.get('hub.challenge'))
-    try:
+    if request.method == "GET":
+        return request.args.get('hub.challenge')
+    else:
         print(request.text)
-    except AttributeError:
-        pass
-    return request.args.get('hub.challenge')
 
 
 @app.route("/profile")
