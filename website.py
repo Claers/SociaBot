@@ -27,7 +27,7 @@ app = Flask(
 
 # Settings for your app
 app.debug = True
-app.secret_key = os.environ.get('app_secret_key')
+app.secret_key = "test"
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
