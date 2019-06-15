@@ -15,6 +15,7 @@ before_script:
   - psql -c "ALTER USER sociabotuser CREATEDB;"
 env:
   - db_uri=postgres+psycopg2://sociabotuser:sociabot123@127.0.0.1:5432/sociabot
+  - app_secret_key = "test"
 script:
   - alembic revision --autogenerate -m 'init'
   - alembic upgrade head
