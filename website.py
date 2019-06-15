@@ -333,8 +333,6 @@ def oauth_callback_twitch():
     """Callback url for twitch authentification
     """
     # token = twitch_func.get_twitch_token_handmade()
-    print(request.full_path)
-    token = request.args.get('access_token')
     """
     twitch = OAuth2Session(
         client_id=twitch_func.twitch_client_id,
@@ -348,28 +346,33 @@ def oauth_callback_twitch():
         authorization_response=request.url,
     )
     """
-    session['twitch_token'] = token
-    twitch = OAuth2Session(
-        twitch_func.twitch_client_id, token=session['twitch_token'])
-    user_id = str(session['user_id'])
-    twitch_user_info = twitch_func.get_twitch_infos(twitch)
-    existing_user = models.session.query(models.User).filter(
-        models.User.id == user_id).first()
-    account = models.session.query(models.TwitchAccount).filter(
-        models.TwitchAccount.twitch_id == twitch_user_info['id']
-    ).first()
-    if account is None:
-        twitch_func.add_twitch_account(existing_user, twitch)
-        session['twitch_account_added'] = True
+    if request.method == "POST":
+        session['twitch_token'] = token
+        twitch = OAuth2Session(
+            twitch_func.twitch_client_id, token=session['twitch_token'])
+        user_id = str(session['user_id'])
+        twitch_user_info = twitch_func.get_twitch_infos(twitch)
+        existing_user = models.session.query(models.User).filter(
+            models.User.id == user_id).first()
+        account = models.session.query(models.TwitchAccount).filter(
+            models.TwitchAccount.twitch_id == twitch_user_info['id']
+        ).first()
+        if account is None:
+            twitch_func.add_twitch_account(existing_user, twitch)
+            session['twitch_account_added'] = True
+        else:
+            account.twitch_access_token = session[
+                'twitch_token']['access_token']
+            account.twitch_refresh_token = session[
+                'twitch_token']['refresh_token']
+            models.session.flush()
+            models.session.commit()
+            session['twitch_account_exist'] = True
+        return redirect(url_for('twitch'))
     else:
-        account.twitch_access_token = session[
-            'twitch_token']['access_token']
-        account.twitch_refresh_token = session[
-            'twitch_token']['refresh_token']
-        models.session.flush()
-        models.session.commit()
-        session['twitch_account_exist'] = True
-    return redirect(url_for('twitch'))
+        return render_template(
+            "twitch_callback.html"
+        )
 
 
 @app.route('/twitch_notif/<server>')
