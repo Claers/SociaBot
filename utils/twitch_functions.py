@@ -1,9 +1,11 @@
 import json
+import random
 
 from requests_oauthlib import OAuth2Session
 from flask import request, session, redirect
 import requests
 from oauthlib.oauth2.rfc6749.errors import TokenExpiredError
+import urllib.parse as parser
 
 import cogs.utils.settings as settings
 import cogs.utils.models as models
@@ -31,7 +33,56 @@ def get_twitch_login_url():
     # get the login url
     login_url, state = oauth.authorization_url(twitch_authorize_url)
     session['state'] = state
+    get_twitch_login_url_handmade()
     return login_url
+
+
+UNICODE_ASCII_CHARACTER_SET = ('abcdefghijklmnopqrstuvwxyz'
+                               'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                               '0123456789')
+
+
+def generate_token(length=30, chars=UNICODE_ASCII_CHARACTER_SET):
+    """Generates a non-guessable OAuth token
+
+    OAuth (1 and 2) does not specify the format of tokens except that they
+    should be strings of random characters. Tokens should not be guessable
+    and entropy when generating the random characters is important. Which is
+    why SystemRandom is used instead of the default random.choice method.
+    """
+    rand = random.SystemRandom()
+    return ''.join(rand.choice(chars) for x in range(length))
+
+
+def get_twitch_login_url_handmade():
+    state = generate_token()
+    print(state)
+    session['state'] = state
+    login_url_req = {
+        "response_type": "code",
+        "client_id": twitch_client_id,
+        "redirect_uri": request.host_url + "oauth_callback_twitch",
+        "scope": twitch_scope,
+        "state": session['state']
+    }
+    url = twitch_authorize_url + "?%s" % parser.urlencode(login_url_req, True)
+    return url
+
+
+def get_twitch_token_handmade():
+    code = parser.urlsplit(request.url).query.split("&")[0].split('=')[1]
+    fetch_token_req = {
+        "code": code,
+        "client_id": twitch_client_id,
+        "redirect_uri": request.host_url + "oauth_callback_twitch",
+        "grant_type": "authorization_code",
+        "client_secret": twitch_client_secret,
+        "state": session['state']
+    }
+    r = requests.post(
+        twitch_token_url + "?%s" % parser.urlencode(fetch_token_req, True))
+    return {"access_token": r.json()['access_token'],
+            "refresh_token": r.json()['refresh_token']}
 
 
 def twitch_stream_set_webhook(user_id, mode):

@@ -297,7 +297,7 @@ def twitter_update_infos():
 def twitch():
     """The twitch configuration page
     """
-    twitch_login_url = twitch_func.get_twitch_login_url()
+    twitch_login_url = twitch_func.get_twitch_login_url_handmade()
     if session.get('twitch_token') is not None:
         twitch = OAuth2Session(
             twitch_func.twitch_client_id, token=session['twitch_token'])
@@ -331,6 +331,8 @@ def twitch():
 def oauth_callback_twitch():
     """Callback url for twitch authentification
     """
+    token = twitch_func.get_twitch_token_handmade()
+    """
     twitch = OAuth2Session(
         client_id=twitch_func.twitch_client_id,
         redirect_uri=request.host_url + "oauth_callback_twitch",
@@ -342,7 +344,10 @@ def oauth_callback_twitch():
         client_secret=twitch_func.twitch_client_secret,
         authorization_response=request.url,
     )
+    """
     session['twitch_token'] = token
+    twitch = OAuth2Session(
+        twitch_func.twitch_client_id, token=session['twitch_token'])
     user_id = str(session['user_id'])
     twitch_user_info = twitch_func.get_twitch_infos(twitch)
     existing_user = models.session.query(models.User).filter(
