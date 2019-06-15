@@ -406,7 +406,7 @@ def twitch_get_stream_notif():
     if request.method == "GET":
         return request.args.get('hub.challenge')
     else:
-        print(request.json())
+        print(request.json)
 
 
 @app.route("/profile")
