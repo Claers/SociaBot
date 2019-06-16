@@ -23,6 +23,7 @@ def get_twitch_login_url():
     """
     Get twitch login url for twitch authentification
     API ref : https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/
+    DEPRECATED IN PRODUCTION DON'T WORK WITH WORKFLOW
     """
     # create an object of OAuth2Session
     oauth = OAuth2Session(
@@ -33,7 +34,6 @@ def get_twitch_login_url():
     # get the login url
     login_url, state = oauth.authorization_url(twitch_authorize_url)
     session['state'] = state
-    get_twitch_login_url_handmade()
     return login_url
 
 
@@ -56,7 +56,6 @@ def generate_token(length=30, chars=UNICODE_ASCII_CHARACTER_SET):
 
 def get_twitch_login_url_handmade():
     state = generate_token()
-    print(state)
     session['state'] = state
     login_url_req = {
         "response_type": "token",
@@ -83,11 +82,6 @@ def get_twitch_token_handmade():
         twitch_token_url + "?%s" % parser.urlencode(fetch_token_req, True))
     return {"access_token": r.json()['access_token'],
             "refresh_token": r.json()['refresh_token']}
-
-
-def get_token_bearer():
-    token = request.url.split('=')[1]
-    return token
 
 
 def twitch_stream_set_webhook(user_id, mode):

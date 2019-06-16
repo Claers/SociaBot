@@ -286,6 +286,10 @@ def twitter_update_infos():
                     server_data['twitter_account_id'] is None):
                 server.twitter_account_linked = int(
                     server_data['twitter_account_id'])
+            if not (server_data['notif_id'] == "None" or
+                    server_data['notif_id'] is None):
+                server.notification_channel_twitter = int(
+                    server_data['notif_id'])
             server.twitter_notification_enabled = server_data['notif_on']
             models.session.flush()
             models.session.commit()
@@ -327,52 +331,32 @@ def twitch():
         return redirect(twitch_login_url)
 
 
-@app.route('/oauth_callback_twitch', methods=['POST', 'GET'])
+@app.route('/oauth_callback_twitch')
 @login_required
 def oauth_callback_twitch():
     """Callback url for twitch authentification
     """
-    # token = twitch_func.get_twitch_token_handmade()
-    """
+    token = twitch_func.get_twitch_token_handmade()
+    session['twitch_token'] = token
     twitch = OAuth2Session(
-        client_id=twitch_func.twitch_client_id,
-        redirect_uri=request.host_url + "oauth_callback_twitch",
-        state=session['state'],
-        scope=twitch_func.twitch_scope
-    )
-    token = twitch.fetch_token(
-        twitch_func.twitch_token_url,
-        client_secret=twitch_func.twitch_client_secret,
-        authorization_response=request.url,
-    )
-    """
-    if request.method == "POST":
-        data = request.json
-        access_token = data.split('&')[0].split('=')[1]
-        session['twitch_token'] = {"access_token": access_token}
-        twitch = OAuth2Session(
-            twitch_func.twitch_client_id, token=session['twitch_token'])
-        user_id = str(session['user_id'])
-        twitch_user_info = twitch_func.get_twitch_infos(twitch)
-        existing_user = models.session.query(models.User).filter(
-            models.User.id == user_id).first()
-        account = models.session.query(models.TwitchAccount).filter(
-            models.TwitchAccount.twitch_id == twitch_user_info['id']
-        ).first()
-        if account is None:
-            twitch_func.add_twitch_account(existing_user, twitch)
-            session['twitch_account_added'] = True
-        else:
-            account.twitch_access_token = session[
-                'twitch_token']['access_token']
-            models.session.flush()
-            models.session.commit()
-            session['twitch_account_exist'] = True
-        return redirect(url_for('twitch'))
+        twitch_func.twitch_client_id, token=session['twitch_token'])
+    user_id = str(session['user_id'])
+    twitch_user_info = twitch_func.get_twitch_infos(twitch)
+    existing_user = models.session.query(models.User).filter(
+        models.User.id == user_id).first()
+    account = models.session.query(models.TwitchAccount).filter(
+        models.TwitchAccount.twitch_id == twitch_user_info['id']
+    ).first()
+    if account is None:
+        twitch_func.add_twitch_account(existing_user, twitch)
+        session['twitch_account_added'] = True
     else:
-        return render_template(
-            "twitch_callback.html"
-        )
+        account.twitch_access_token = session[
+            'twitch_token']['access_token']
+        models.session.flush()
+        models.session.commit()
+        session['twitch_account_exist'] = True
+    return redirect(url_for('twitch'))
 
 
 @app.route('/twitch_notif/<server>')

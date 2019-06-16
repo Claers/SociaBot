@@ -56,6 +56,7 @@ class TestTwitchUtilsFunctions(TestCase):
                 side_effect=mock_oauth_authorization_url)
     def test_get_twitch_login_url(self, oauth_authorization_url):
         """Test the get_twitch_login_url function
+        DEPRECATED IN PRODUCTION DON'T WORK WITH WORKFLOW
         """
         with self.app.test_request_context('/twitch'):
             url = twitch_funcs.get_twitch_login_url()
@@ -73,3 +74,6 @@ class TestTwitchUtilsFunctions(TestCase):
             infos = twitch_funcs.get_twitch_infos(
                 requests_oauthlib.OAuth2Session)
             self.assertEqual('test', infos['username'])
+
+    def test_get_twitch_login_url_handmade(self):
+        pass
