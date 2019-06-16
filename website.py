@@ -16,8 +16,9 @@ import os
 from urllib.parse import quote_plus, unquote
 import bot
 
-template_dir = os.path.abspath('./site/templates')
-static_dir = os.path.abspath('./site/static')
+dir_path = os.path.dirname(os.path.realpath(__file__))
+template_dir = os.path.normpath(os.path.join(dir_path, './site/templates'))
+static_dir = os.path.normpath(os.path.join(dir_path,  './site/static'))
 app = Flask(
     __name__,
     template_folder=template_dir,
@@ -407,6 +408,7 @@ def twitch_get_stream_notif():
         return request.args.get('hub.challenge')
     else:
         print(request.json)
+        return(request.json)
 
 
 @app.route("/profile")
