@@ -94,7 +94,7 @@ class Twitter(Cog):
                 tweet_object, datetime.fromtimestamp(tweet['timestamp']))
             guild = self.bot.get_guild(int(server_id))
             for channel in guild.channels:
-                if channel.id == channel_to_notif_id:
+                if channel.id == int(channel_to_notif_id):
                     return await channel.send("Nouveau tweet : " +
                                               tweet['tweet_url'])
 

@@ -42,8 +42,8 @@ class Server(Base):
     twitter_account_linked = Column(Integer, ForeignKey("twitter_account.id"))
     twitter_notification_enabled = Column(Boolean)
     twitch_notification_enabled = Column(Boolean)
-    notification_channel_twitter = Column(Integer)
-    notification_channel_twitch = Column(Integer)
+    notification_channel_twitter = Column(String)
+    notification_channel_twitch = Column(String)
 
     def __repr__(self):
         return "<Server(id='{}', server_name='{}', admin_name='{}')>".format(

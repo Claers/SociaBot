@@ -288,7 +288,7 @@ def twitter_update_infos():
                     server_data['twitter_account_id'])
             if not (server_data['notif_id'] == "None" or
                     server_data['notif_id'] is None):
-                server.notification_channel_twitter = int(
+                server.notification_channel_twitter = str(
                     server_data['notif_id'])
             server.twitter_notification_enabled = server_data['notif_on']
             models.session.flush()
