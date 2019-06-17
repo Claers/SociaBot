@@ -38,7 +38,7 @@ Twitter
             </a>
         </div>
         {% if twitter_accounts is not none %}
-        <div id="twitter">
+        <div>
             <div class="tabs is-toggle scroll">
                 <ul>
                     {% for i in range(bot_user_guilds|length) %}
@@ -50,76 +50,78 @@ Twitter
                     {% endfor %}
                 </ul>
             </div>
-            {% for i in range(bot_user_guilds|length) %}
-            <div class="twitter-update" id="{{bot_user_guilds[i].server_id}}" {% if i != 0%}style="display:none"
-                {%endif%}>
-                <div class="level {{bot_user_guilds[i].id}}">
-                    <div class="level-item has-text-centered subtitle">
-                        Utiliser le compte :
-                    </div>
-                    <div class="dropdown level-item has-text-centered twitter_accounts" id="use_account">
-                        <div class="dropdown-trigger">
-                            <button onclick="toggleDropdown(this);" class="button" aria-haspopup="true"
-                                aria-controls="dropdown-menu">
-                                <span id="item-selected">Selectionnez un compte</span>
-                                <span class="icon is-small">
-                                    <i class="fas fa-angle-down" aria-hidden="true"></i>
-                                </span>
-                            </button>
+            <div id="twitter">
+                {% for i in range(bot_user_guilds|length) %}
+                <div class="twitter-update" id="{{bot_user_guilds[i].server_id}}" {% if i != 0%}style="display:none"
+                    {%endif%}>
+                    <div class="level {{bot_user_guilds[i].id}}">
+                        <div class="level-item has-text-centered subtitle">
+                            Utiliser le compte :
                         </div>
-                        <div class="dropdown-menu twitter_account_dropdown" id="use_account_dropdown" role="select">
-                            <div class="dropdown-content">
-                                <a onclick="twitter_account_id = 'None'; contentSelect(this, 'unselect');"
-                                    class="dropdown-item">
-                                    None
-                                </a>
-                                {% for n in range(twitter_accounts|length) %}
-                                <a onclick="twitter_account_id = '{{ twitter_accounts[n]['id'] }}'; contentSelect(this, 'twitter');"
-                                    class="dropdown-item">
-                                    {{twitter_accounts[n]['twitter_name']}}
-                                </a>
-                                {% endfor %}
+                        <div class="dropdown level-item has-text-centered twitter_accounts" id="use_account">
+                            <div class="dropdown-trigger">
+                                <button onclick="toggleDropdown(this);" class="button" aria-haspopup="true"
+                                    aria-controls="dropdown-menu">
+                                    <span id="item-selected">Selectionnez un compte</span>
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="dropdown-menu twitter_account_dropdown" id="use_account_dropdown" role="select">
+                                <div class="dropdown-content">
+                                    <a onclick="twitter_account_id = 'None'; contentSelect(this, 'unselect');"
+                                        class="dropdown-item">
+                                        None
+                                    </a>
+                                    {% for n in range(twitter_accounts|length) %}
+                                    <a onclick="twitter_account_id = '{{ twitter_accounts[n]['id'] }}'; contentSelect(this, 'twitter');"
+                                        class="dropdown-item">
+                                        {{twitter_accounts[n]['twitter_name']}}
+                                    </a>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="level-item has-text-centered subtitle">
-                        sur le serveur : {{bot_user_guilds[i].server_name}}
-                    </div>
-                    <div class="level-item">
-                        <label class="subtitle" for="notif">
-                            Notification :</label>
-                        <input onclick="changeText(this);" class="checkbox" id="notifs" type="checkbox" name="notifs"
-                            class="switch is-success" disabled>
-                        <label class="subtitle after-checkbox" for="notif">Désactivé</label>
-                    </div>
-                    <div class="dropdown level-item has-text-centered channels_id" id="use_account">
-                        <div class="dropdown-trigger">
-                            <button onclick="toggleDropdown(this);" class="button" aria-haspopup="true"
-                                aria-controls="dropdown-menu">
-                                <span id="item-selected">Selectionnez un channel</span>
-                                <span class="icon is-small">
-                                    <i class="fas fa-angle-down" aria-hidden="true"></i>
-                                </span>
-                            </button>
+                        <div class="level-item has-text-centered subtitle">
+                            sur le serveur : {{bot_user_guilds[i].server_name}}
                         </div>
-                        <div class="dropdown-menu twitter_account_dropdown" id="use_account_dropdown" role="select">
-                            <div class="dropdown-content">
-                                <a onclick="channel_id = 'None'; contentSelect(this, 'unselect');"
-                                    class="dropdown-item">
-                                    None
-                                </a>
-                                {% for n in range(channels[bot_user_guilds[i].server_id]|length) %}
-                                <a onclick="channel_id = '{{ channels[bot_user_guilds[i].server_id][n]['id'] }}'; contentSelect(this, 'channel');"
-                                    class="dropdown-item">
-                                    {{channels[bot_user_guilds[i].server_id][n]['name']}}
-                                </a>
-                                {% endfor %}
+                        <div class="level-item">
+                            <label class="subtitle" for="notif">
+                                Notification :</label>
+                            <input onclick="changeText(this);" class="checkbox" id="notifs" type="checkbox"
+                                name="notifs" class="switch is-success" disabled>
+                            <label class="subtitle after-checkbox" for="notif">Désactivé</label>
+                        </div>
+                        <div class="dropdown level-item has-text-centered channels_id" id="use_account">
+                            <div class="dropdown-trigger">
+                                <button onclick="toggleDropdown(this);" class="button" aria-haspopup="true"
+                                    aria-controls="dropdown-menu">
+                                    <span id="item-selected">Selectionnez un channel</span>
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="dropdown-menu twitter_account_dropdown" id="use_account_dropdown" role="select">
+                                <div class="dropdown-content">
+                                    <a onclick="channel_id = 'None'; contentSelect(this, 'unselect');"
+                                        class="dropdown-item">
+                                        None
+                                    </a>
+                                    {% for n in range(channels[bot_user_guilds[i].server_id]|length) %}
+                                    <a onclick="channel_id = '{{ channels[bot_user_guilds[i].server_id][n]['id'] }}'; contentSelect(this, 'channel');"
+                                        class="dropdown-item">
+                                        {{channels[bot_user_guilds[i].server_id][n]['name']}}
+                                    </a>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
         {% endif %}
         <div class="level">
