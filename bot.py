@@ -54,6 +54,9 @@ async def on_ready():
 
 @client.event
 async def on_guild_join(guild):
+    game = discord.Game(name="Connected on " + str(len(client.guilds))
+                        + " servers ", start=datetime.now())
+    await client.change_presence(activity=game)
     serv = models.Server(
         server_id=str(guild.id),
         server_name=guild.name,

@@ -87,6 +87,15 @@ function sendJsonData(el) {
 
 }
 
+function openServer(server_name) {
+    var i;
+    var x = document.getElementsByClassName("twitter-update");
+    for (i = 0; i < x.length; i++) {
+        x[i].style.display = "none";
+    }
+    document.getElementById(server_name).style.display = "block";
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
         $notification = $delete.parentNode;
