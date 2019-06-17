@@ -90,7 +90,7 @@ function sendJsonData(el) {
 function openServer(server_id, el) {
     var i;
     var server = document.getElementsByClassName("twitter-update");
-    var server_list = document.getElementsByClassName("server-list").children;
+    var server_list = document.getElementsByClassName("server-list");
     for (i = 0; i < server.length; i++) {
         server[i].style.display = "none";
     }
