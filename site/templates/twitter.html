@@ -51,7 +51,8 @@ Twitter
                 </ul>
             </div>
             {% for i in range(bot_user_guilds|length) %}
-            <div class="twitter-update" id="{{bot_user_guilds[i].server_name}}">
+            <div class="twitter-update" id="{{bot_user_guilds[i].server_id}}" {% if i != 0%}style="display:none"
+                {%endif%}>
                 <div class="level {{bot_user_guilds[i].id}}">
                     <div class="level-item has-text-centered subtitle">
                         Utiliser le compte :

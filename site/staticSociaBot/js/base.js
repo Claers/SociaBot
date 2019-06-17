@@ -87,13 +87,13 @@ function sendJsonData(el) {
 
 }
 
-function openServer(server_name) {
+function openServer(server_id) {
     var i;
     var x = document.getElementsByClassName("twitter-update");
     for (i = 0; i < x.length; i++) {
         x[i].style.display = "none";
     }
-    document.getElementById(server_name).style.display = "block";
+    document.getElementById(server_id).style.display = "block";
 }
 
 document.addEventListener('DOMContentLoaded', () => {
