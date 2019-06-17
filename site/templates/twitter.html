@@ -40,10 +40,10 @@ Twitter
         {% if twitter_accounts is not none %}
         <div id="twitter">
             <div class="tabs is-toggle scroll">
-                <ul>
+                <ul class="server-list">
                     {% for i in range(bot_user_guilds|length) %}
                     <li {% if i == 0%}class="is-active" {%endif%}>
-                        <a class="subtitle" onclick="openServer('{{bot_user_guilds[i].server_id}}')">
+                        <a class="subtitle" onclick="openServer('{{bot_user_guilds[i].server_id}}', this.parent);">
                             {{bot_user_guilds[i].server_name}}
                         </a>
                     </li>

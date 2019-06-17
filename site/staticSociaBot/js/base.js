@@ -87,12 +87,17 @@ function sendJsonData(el) {
 
 }
 
-function openServer(server_id) {
+function openServer(server_id, el) {
     var i;
-    var x = document.getElementsByClassName("twitter-update");
-    for (i = 0; i < x.length; i++) {
-        x[i].style.display = "none";
+    var server = document.getElementsByClassName("twitter-update");
+    var server_list = document.getElementsByClassName("server-list");
+    for (i = 0; i < server.length; i++) {
+        server[i].style.display = "none";
     }
+    for (i = 0; i < server_list.length; i++) {
+        server_list[i].classList.remove('is-active');
+    }
+    el.classList.add('is-active');
     document.getElementById(server_id).style.display = "block";
 }
 
