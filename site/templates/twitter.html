@@ -43,7 +43,7 @@ Twitter
                 <ul>
                     {% for i in range(bot_user_guilds|length) %}
                     <li {% if i == 0%}class="is-active" {%endif%}>
-                        <a class="subtitle">
+                        <a class="subtitle" onclick="openServer('{{bot_user_guilds[i].server_id}}')">
                             {{bot_user_guilds[i].server_name}}
                         </a>
                     </li>
