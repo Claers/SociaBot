@@ -97,7 +97,7 @@ function openServer(server_id, el) {
     for (i = 0; i < server_list.length; i++) {
         server_list[i].classList.remove('is-active');
     }
-    el.classList.add('is-active');
+    el.parentElement.classList.add('is-active');
     document.getElementById(server_id).style.display = "block";
 }
 
