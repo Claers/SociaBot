@@ -98,5 +98,5 @@ if __name__ == '__main__':
         client.load_extension(extension)
     flasktr = threading.Thread(target=website.app.run)
     bottr = threading.Thread(target=client.run, args=(
-        settings.discord_token,))
+        settings.discord_bot_token,))
     bottr.start()

@@ -56,8 +56,8 @@ function changeText(el) {
     }
 }
 
-var twitter_account_id = null;
-var channel_id = null;
+var twitter_account_id = {};
+var channel_id = {};
 
 function sendJsonData(el) {
     var i;
@@ -65,13 +65,13 @@ function sendJsonData(el) {
     var servers = window.servers;
     el.setAttribute("disabled", true);
     for (i = 0; i < servers.length; i++) {
-        server_id = servers[i].className.split(' ')[1];
-        notif_on = servers[i].children[3].children[1].checked;
+        server_id = servers[i].id;
+        notif_on = servers[i].children[0].children[3].children[1].checked;
         jsonData.push({
             'server_id': server_id,
-            'twitter_account_id': twitter_account_id,
+            'twitter_account_id': twitter_account_id[server_id],
             'notif_on': notif_on,
-            'notif_id': channel_id
+            'notif_id': channel_id[server_id]
         })
     }
     $.ajax({

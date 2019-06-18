@@ -91,6 +91,7 @@ class Tweet(Base):
     tweet_url = Column(URLType)
     tweet_date = Column(DateTime)
     twitter_account_id = Column(Integer, ForeignKey("twitter_account.id"))
+    is_send_by_bot = Column(Boolean)
 
     def __repr__(self):
         return "<Tweet(id='{}', content='{}', url='{}')>".format(

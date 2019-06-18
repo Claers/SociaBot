@@ -88,11 +88,14 @@ class Twitter(Cog):
                 'tweet': tweet['tweet_content'],
                 'tweet_url': tweet['tweet_url'],
                 'account_id': twitter_account.id,
-                'media_url': tweet['medias_url']
+                'media_url': tweet['medias_url'],
+                'is_send_by_bot': False
             }
             self._send_tweet_object(
                 tweet_object, datetime.fromtimestamp(tweet['timestamp']))
-            guild = self.bot.get_guild(int(server_id))
+            await asyncio.sleep(5)
+        guild = self.bot.get_guild(int(server_id))
+        if tweet_db.is_send_by_bot is False:
             for channel in guild.channels:
                 if channel.id == int(channel_to_notif_id):
                     return await channel.send("Nouveau tweet : " +
@@ -110,7 +113,8 @@ class Twitter(Cog):
             tweet_content=tweet_object_content['tweet'],
             tweet_url=tweet_object_content['tweet_url'],
             tweet_date=datetime,
-            twitter_account_id=tweet_object_content['account_id']
+            twitter_account_id=tweet_object_content['account_id'],
+            is_send_by_bot=tweet_object_content['is_send_by_bot']
         )
         models.session.add(tweet_object)
         models.session.flush()
@@ -374,6 +378,7 @@ class Twitter(Cog):
         tweet_object_content = {}
         tweet_object_content['tweet'] = tweet
         tweet_object_content['account_id'] = server.twitter_account_linked
+        tweet_object_content['is_send_by_bot'] = True
         # If message have attachment
         if len(ctx.message.attachments) == 1:
             tweet_object_content = await self._tweet_with_media_logic(
@@ -443,6 +448,7 @@ class MyStreamListener(tweepy.StreamListener):
         server = models.session.query(models.Server).filter(
             models.Server.server_id == self.server_id
         ).first()
+        print(server.server_name)
         if server.twitter_notification_enabled:
             tweet_id = status._json['id']
             user_id = status._json['user']['id_str']

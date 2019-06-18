@@ -280,8 +280,9 @@ def twitter_update_infos():
         data = request.json
         for server_data in data:
             server = models.session.query(models.Server).filter(
-                models.Server.id == int(server_data['server_id'])
+                models.Server.server_id == str(server_data['server_id'])
             ).first()
+            print(server_data)
             if not (server_data['twitter_account_id'] == "None" or
                     server_data['twitter_account_id'] is None):
                 server.twitter_account_linked = int(

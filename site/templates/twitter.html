@@ -70,12 +70,12 @@ Twitter
                             </div>
                             <div class="dropdown-menu twitter_account_dropdown" id="use_account_dropdown" role="select">
                                 <div class="dropdown-content">
-                                    <a onclick="twitter_account_id = 'None'; contentSelect(this, 'unselect');"
+                                    <a onclick="twitter_account_id['{{bot_user_guilds[i].server_id}}'] = 'None'; contentSelect(this, 'unselect');"
                                         class="dropdown-item">
                                         None
                                     </a>
                                     {% for n in range(twitter_accounts|length) %}
-                                    <a onclick="twitter_account_id = '{{ twitter_accounts[n]['id'] }}'; contentSelect(this, 'twitter');"
+                                    <a onclick="twitter_account_id['{{bot_user_guilds[i].server_id}}'] = '{{ twitter_accounts[n]['id'] }}'; contentSelect(this, 'twitter');"
                                         class="dropdown-item">
                                         {{twitter_accounts[n]['twitter_name']}}
                                     </a>
@@ -105,12 +105,12 @@ Twitter
                             </div>
                             <div class="dropdown-menu twitter_account_dropdown" id="use_account_dropdown" role="select">
                                 <div class="dropdown-content">
-                                    <a onclick="channel_id = 'None'; contentSelect(this, 'unselect');"
+                                    <a onclick="channel_id['{{bot_user_guilds[i].server_id}}'] = 'None'; contentSelect(this, 'unselect');"
                                         class="dropdown-item">
                                         None
                                     </a>
                                     {% for n in range(channels[bot_user_guilds[i].server_id]|length) %}
-                                    <a onclick="channel_id = '{{ channels[bot_user_guilds[i].server_id][n]['id'] }}'; contentSelect(this, 'channel');"
+                                    <a onclick="channel_id['{{bot_user_guilds[i].server_id}}'] = '{{ channels[bot_user_guilds[i].server_id][n]['id'] }}'; contentSelect(this, 'channel');"
                                         class="dropdown-item">
                                         {{channels[bot_user_guilds[i].server_id][n]['name']}}
                                     </a>
@@ -133,7 +133,7 @@ Twitter
 </section>
 <script>
     var twitter = document.getElementById('twitter');
-    var servers = twitter.children[0].children;
+    var servers = twitter.children;
     var bot_user_guilds = JSON.parse('{{ bot_user_guilds | tojson | safe }}');
 </script>
 <script src="{{ url_for('static', filename='js/base.js') }}"></script>
