@@ -87,6 +87,7 @@ def get_user(discord):
         base_discord_api_url + '/users/@me/guilds').json()
     # set user owned guild if guild is in DataBase
     for user_guild in user_guilds:
+        print(user_guild)
         guild = models.session.query(models.Server).filter(
             models.Server.server_id == str(user_guild['id'])).first()
         if guild is not None:
@@ -120,7 +121,7 @@ def get_user(discord):
         session['twitch_accounts'] = twitch_account_cred
 
 
-@app.route('/discord')
+@app.route('/sociabot/discord')
 def discord_connection():
     """
     Return to discord login url
@@ -129,7 +130,7 @@ def discord_connection():
     return redirect(login_url)
 
 
-@app.route("/oauth_callback_discord")
+@app.route('/sociabot/oauth_callback_discord')
 def oauth_callback_discord():
     """
     The callback we specified in our app.
@@ -167,7 +168,7 @@ def oauth_callback_discord():
     return redirect(url_for('index'))
 
 
-@app.route('/')
+@app.route('/sociabot/')
 @login_required
 def index():
     """The home page
@@ -186,7 +187,7 @@ def index():
         username=user_info['username'])
 
 
-@app.route('/twitter')
+@app.route('/sociabot/twitter')
 @login_required
 def twitter():
     """The twitter configuration page
@@ -244,7 +245,7 @@ def twitter():
     )
 
 
-@app.route('/oauth_callback_twitter')
+@app.route('/sociabot/oauth_callback_twitter')
 @login_required
 def oauth_callback_twitter():
     """Callback url for twitter authentification
@@ -271,7 +272,7 @@ def oauth_callback_twitter():
     return(redirect(url_for('twitter')))
 
 
-@app.route('/twitter_update_infos/', methods=['POST'])
+@app.route('/sociabot/twitter_update_infos/', methods=['POST'])
 @login_required
 def twitter_update_infos():
     """View used only in POST to get data from twitter configuration page
@@ -279,18 +280,24 @@ def twitter_update_infos():
     if request.method == 'POST':
         data = request.json
         for server_data in data:
+            print(server_data)
             server = models.session.query(models.Server).filter(
                 models.Server.server_id == str(server_data['server_id'])
             ).first()
-            print(server_data)
-            if not (server_data['twitter_account_id'] == "None" or
-                    server_data['twitter_account_id'] is None):
-                server.twitter_account_linked = int(
-                    server_data['twitter_account_id'])
-            if not (server_data['notif_id'] == "None" or
-                    server_data['notif_id'] is None):
-                server.notification_channel_twitter = str(
-                    server_data['notif_id'])
+            try:
+                if not (server_data['twitter_account_id'] == "None" or
+                        server_data['twitter_account_id'] is None):
+                    server.twitter_account_linked = int(
+                        server_data['twitter_account_id'])
+            except KeyError:
+                server.twitter_account_linked = None
+            try:
+                if not (server_data['notif_id'] == "None" or
+                        server_data['notif_id'] is None):
+                    server.notification_channel_twitter = str(
+                        server_data['notif_id'])
+            except KeyError:
+                server.notification_channel_twitter = None
             server.twitter_notification_enabled = server_data['notif_on']
             models.session.flush()
             models.session.commit()
@@ -298,7 +305,7 @@ def twitter_update_infos():
         return str(data)
 
 
-@app.route('/twitch')
+@app.route('/sociabot/twitch')
 @login_required
 def twitch():
     """The twitch configuration page
@@ -332,7 +339,7 @@ def twitch():
         return redirect(twitch_login_url)
 
 
-@app.route('/oauth_callback_twitch')
+@app.route('/sociabot/oauth_callback_twitch')
 @login_required
 def oauth_callback_twitch():
     """Callback url for twitch authentification
@@ -360,7 +367,7 @@ def oauth_callback_twitch():
     return redirect(url_for('twitch'))
 
 
-@app.route('/twitch_notif/<server>')
+@app.route('/sociabot/twitch_notif/<server>')
 @login_required
 def twitch_notif(server):
     """Toggle twitch notification
@@ -387,7 +394,7 @@ def twitch_notif(server):
     return redirect(url_for('twitch'))
 
 
-@app.route('/stream_webhook', methods=['POST', 'GET'])
+@app.route('/sociabot/stream_webhook', methods=['POST', 'GET'])
 def twitch_get_stream_notif():
     if request.method == "GET":
         return request.args.get('hub.challenge')
@@ -396,7 +403,7 @@ def twitch_get_stream_notif():
         return(request.json)
 
 
-@app.route("/profile")
+@app.route('/sociabot/profile')
 @login_required
 def profile():
     """
@@ -427,7 +434,7 @@ def profile():
     )
 
 
-@app.route("/bot-server-added")
+@app.route('/sociabot/bot-server-added')
 @login_required
 def bot_server_added():
     session['bot_server_added'] = True
@@ -441,7 +448,7 @@ def invite_bot_to(server_name):
     return redirect(url_for('index'))
 
 
-@app.route('/blacktheme/<enabled>/<actualUrl>')
+@app.route('/sociabot/blacktheme/<enabled>/<actualUrl>')
 @login_required
 def black_theme(enabled, actualUrl):
     """Toogle black theme

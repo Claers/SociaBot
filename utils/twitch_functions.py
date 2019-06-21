@@ -86,14 +86,12 @@ def get_twitch_token_handmade():
 
 def twitch_stream_set_webhook(user_id, mode):
     url = 'https://api.twitch.tv/helix/webhooks/hub'
-    print(request.host_url +
-          "stream_webhook")
     payload = {
         "hub.mode": mode,
         "hub.topic": "https://api.twitch.tv/helix/streams?user_id=" + user_id,
         "hub.lease_seconds": 864000,
         "hub.callback":  request.host_url +
-        "stream_webhook",
+        "sociabot/stream_webhook",
     }
     headers = {"Client-ID": twitch_client_id}
     response = requests.post(url, payload, headers=headers)

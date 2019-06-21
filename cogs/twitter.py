@@ -74,32 +74,14 @@ class Twitter(Cog):
     async def get_tweet(self, tweet, server_id):
         """Handling data when getting tweet
         """
-        twitter_account = models.session.query(models.TwitterAccount).filter(
-            models.TwitterAccount.account_user_id == tweet['user_id']
-        ).first()
-        tweet_db = models.session.query(models.Tweet).filter(
-            models.Tweet.tweet_url == tweet['tweet_url']
-        ).first()
         channel_to_notif_id = models.session.query(models.Server).filter(
             models.Server.server_id == server_id
         ).first().notification_channel_twitter
-        if tweet_db is None:
-            tweet_object = {
-                'tweet': tweet['tweet_content'],
-                'tweet_url': tweet['tweet_url'],
-                'account_id': twitter_account.id,
-                'media_url': tweet['medias_url'],
-                'is_send_by_bot': False
-            }
-            self._send_tweet_object(
-                tweet_object, datetime.fromtimestamp(tweet['timestamp']))
-            await asyncio.sleep(5)
         guild = self.bot.get_guild(int(server_id))
-        if tweet_db.is_send_by_bot is False:
-            for channel in guild.channels:
-                if channel.id == int(channel_to_notif_id):
-                    return await channel.send("Nouveau tweet : " +
-                                              tweet['tweet_url'])
+        for channel in guild.channels:
+            if channel.id == int(channel_to_notif_id):
+                return await channel.send("Nouveau tweet : " +
+                                          tweet['tweet_url'])
 
     def _send_tweet_object(self, tweet_object_content,
                            datetime=datetime.now()):
@@ -445,10 +427,12 @@ class MyStreamListener(tweepy.StreamListener):
         super().__init__(api=api)
 
     def on_status(self, status):
+        """This function is called when a status is created on the twitter
+        account of the user
+        """
         server = models.session.query(models.Server).filter(
             models.Server.server_id == self.server_id
         ).first()
-        print(server.server_name)
         if server.twitter_notification_enabled:
             tweet_id = status._json['id']
             user_id = status._json['user']['id_str']
@@ -458,6 +442,14 @@ class MyStreamListener(tweepy.StreamListener):
             tweet_content = status._json['text']
             timestamp = status._json['timestamp_ms']
             timestamp = int(round(int(timestamp) / 1000))
+            try:
+                status._json['retweeted_status']
+                is_retweet = True
+            except KeyError:
+                is_retweet = False
+            if server.retweet_activated is not None:
+                if is_retweet is True and server.retweet_activated is False:
+                    return "stop"
             medias_url = []
             if 'media' in status._json['entities']:
                 for media in status._json['entities']['media']:
@@ -469,7 +461,28 @@ class MyStreamListener(tweepy.StreamListener):
                      'tweet_url': tweet_url,
                      'medias_url': medias_url,
                      'timestamp': timestamp}
-            if 'Twitter' in self.bot.cogs:
+            twitter_account = models.session.query(
+                models.TwitterAccount).filter(
+                models.TwitterAccount.account_user_id == tweet['user_id']
+            ).first()
+            tweet_db = models.session.query(models.Tweet).filter(
+                models.Tweet.tweet_url == tweet['tweet_url']
+            ).first()
+            if tweet_db is None:
+                tweet_object = {
+                    'tweet': tweet['tweet_content'],
+                    'tweet_url': tweet['tweet_url'],
+                    'account_id': twitter_account.id,
+                    'media_url': tweet['medias_url'],
+                    'is_send_by_bot': False
+                }
+                self.bot.cogs['Twitter']._send_tweet_object(
+                    tweet_object, datetime.fromtimestamp(tweet['timestamp']))
+            while tweet_db is None:
+                tweet_db = models.session.query(models.Tweet).filter(
+                    models.Tweet.tweet_url == tweet['tweet_url']
+                ).first()
+            if 'Twitter' in self.bot.cogs and tweet_db.is_send_by_bot is False:
                 self.bot.cogs['Twitter'].loop_handle(
                     tweet, self.server_id)
             else:

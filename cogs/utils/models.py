@@ -44,6 +44,7 @@ class Server(Base):
     twitch_notification_enabled = Column(Boolean)
     notification_channel_twitter = Column(String)
     notification_channel_twitch = Column(String)
+    retweet_activated = Column(Boolean)
 
     def __repr__(self):
         return "<Server(id='{}', server_name='{}', admin_name='{}')>".format(
