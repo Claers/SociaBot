@@ -13,7 +13,7 @@ class Twitch(Cog):
         self.future_reload_listener = asyncio.run_coroutine_threadsafe(
             coro, loop)
 
-    def wait_for_twitch_notif(self):
+    async def wait_for_twitch_notif(self):
         twitch_notif_data = {}
         while True:
             is_file_exist = os.path.isfile("./twitch_notif")
