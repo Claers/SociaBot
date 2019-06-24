@@ -74,7 +74,8 @@ def get_twitch_token_handmade():
     fetch_token_req = {
         "code": code,
         "client_id": twitch_client_id,
-        "redirect_uri": request.host_url + "oauth_callback_twitch",
+        "redirect_uri": request.host_url + "sociabot/" +
+        "oauth_callback_twitch",
         "grant_type": "authorization_code",
         "client_secret": twitch_client_secret,
         "state": session['state']

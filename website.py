@@ -142,7 +142,7 @@ def oauth_callback_discord():
     # create an object of Oauth2Session
     discord = OAuth2Session(
         client_id=client_id,
-        redirect_uri=request.host_url + 'sociabot/' + 'oauth_callback_discord',
+        redirect_uri=request.host_url + "sociabot/" + "oauth_callback_discord",
         state=session['state'],
         scope=scope
     )

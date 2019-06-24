@@ -394,11 +394,12 @@ class Twitter(Cog):
     @checks.is_server()
     async def tweet(self, ctx):
         """This function is used when command !tweet [text] is send
+        This function is the hook for tweet function
         """
         await self.tweet_func(ctx)
 
     async def tweet_delete_func(self, ctx):
-        """This function is used to delete a tweet from twitter and into the
+        """This function is used to delete a tweet in Twitter and into the
         database
         """
         tweetURL = ctx.message.clean_content.replace('!dTweet ', '')

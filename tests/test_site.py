@@ -40,7 +40,7 @@ class TestSite(TestCase):
     @mock.patch('utils.discord_functions.user_infos',
                 side_effect=mock_user_infos)
     def test_index_logged(self, oauth2_get, user_infos):
-        """The if the login_required decorator works and the home page
+        """Test if the login_required decorator works and the home page
         """
         with self.app.session_transaction() as sess:
             sess['discord_token'] = "0"

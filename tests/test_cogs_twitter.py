@@ -553,7 +553,9 @@ class TestCogsTwitter(TestCase):
 
     @async_test
     async def test_tweet_func_without_account(self):
-        """Test the twitter.Twitter.tweet_func function without account
+        """Test the tweet function
+        This function is used when command !tweet [text] is send
+        This is the main logic for sending a tweet
         """
         state = MockState()
         author = MockUser()
