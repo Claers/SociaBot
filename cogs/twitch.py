@@ -18,7 +18,7 @@ class Twitch(Cog):
         while True:
             is_file_exist = os.path.isfile("./twitch_notif")
             if is_file_exist:
-                with open("twitch_notif") as f:
+                with open("./twitch_notif") as f:
                     twitch_notif_data = json.loads(f)
                 print(twitch_notif_data)
                 os.remove("./twitch_notif")

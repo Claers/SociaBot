@@ -409,7 +409,7 @@ def twitch_get_stream_notif():
         data = json.dumps(request.json)
         file.write(data)
         file.close()
-        return request.args.get('hub.challenge')
+        return "ok"
 
 
 @app.route('/sociabot/profile')
