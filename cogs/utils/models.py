@@ -56,7 +56,8 @@ class Server(Base):
             'server_id': self.server_id,
             'server_name': self.server_name,
             'twitter_notification_enabled': self.twitter_notification_enabled,
-            'twitch_notification_enabled': self.twitch_notification_enabled
+            'twitch_notification_enabled': self.twitch_notification_enabled,
+            'retweet_activated': self.retweet_activated
         }
 
 

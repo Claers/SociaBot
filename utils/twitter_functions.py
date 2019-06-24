@@ -1,5 +1,5 @@
 from requests_oauthlib import OAuth1Session
-from flask import request
+from flask import request, url_for
 import cogs.utils.settings as settings
 import cogs.utils.models as models
 
@@ -20,12 +20,13 @@ def twitter_get_resource_token():
     request_token = OAuth1Session(
         client_key=twitter_consumer_key,
         client_secret=twitter_consumer_secret,
-        callback_uri=request.host_url + "oauth_callback_twitter"
+        callback_uri=request.host_url[:-1] + url_for('oauth_callback_twitter')
     )
     # twitter endpoint to get request token
     url = 'https://api.twitter.com/oauth/request_token'
     # get request_token_key, request_token_secret and other details
     data = request_token.get(url)
+    print(data.text)
     # split the string to get relevant data
     data_token = str.split(data.text, '&')
     ro_key = str.split(data_token[0], '=')

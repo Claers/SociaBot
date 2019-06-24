@@ -6,6 +6,7 @@ import asyncio
 import base64
 import math
 import json
+import os
 
 import tweepy
 from requests_oauthlib import OAuth1
@@ -35,6 +36,10 @@ class Twitter(Cog):
         self.stream = {}
         self._twitter_account_setup()
         self.future_tweet_listener = None
+        loop = self.bot.loop
+        coro = self.wait_for_reload_config()
+        self.future_reload_listener = asyncio.run_coroutine_threadsafe(
+            coro, loop)
 
     def _twitter_account_setup(self):
         """Load all twitter account configured in the database into a list of
@@ -62,6 +67,15 @@ class Twitter(Cog):
                     auth=api.auth,
                     listener=self.streamListener[server_id])
                 self.stream[server_id].filter(follow=[id], is_async=True)
+
+    async def wait_for_reload_config(self):
+        while True:
+            is_file_exist = os.path.isfile("./need_to_reload")
+            if is_file_exist:
+                self._twitter_account_setup()
+                os.remove("./need_to_reload")
+            else:
+                await asyncio.sleep(3)
 
     def loop_handle(self, tweet, server_id):
         """Used to start a coroutine when receiving tweet
@@ -447,6 +461,8 @@ class MyStreamListener(tweepy.StreamListener):
                 is_retweet = True
             except KeyError:
                 is_retweet = False
+            print("rt_activated : " + server.retweet_activated)
+            print("is retweet : " + is_retweet)
             if server.retweet_activated is not None:
                 if is_retweet is True and server.retweet_activated is False:
                     return "stop"

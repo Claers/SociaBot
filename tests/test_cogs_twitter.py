@@ -39,6 +39,10 @@ class MockBotBase(discord.ext.commands.bot.BotBase):
     def cogs(self):
         return {}
 
+    @property
+    def loop(self):
+        return ""
+
 
 class MockBot(MockBotBase, discord.Client):
     """Mock the discord.ext.commands.Bot class
@@ -325,6 +329,10 @@ def mock_requests_post_media(url, auth, data):
         pass
 
 
+def mock_asyncio_run_coroutine_threadsafe(coro, loop):
+    return True
+
+
 class TestCogsTwitter(TestCase):
     """Tests for cogs.twitter.py
     """
@@ -334,7 +342,10 @@ class TestCogsTwitter(TestCase):
                 side_effect=MockTweepyStream)
     @mock.patch('cogs.twitter.MyStreamListener',
                 side_effect=MockStreamListener)
-    def setUp(self, tweepy_api, tweepy_stream, stream_listener):
+    @mock.patch('asyncio.run_coroutine_threadsafe',
+                side_effect=mock_asyncio_run_coroutine_threadsafe)
+    def setUp(self, tweepy_api,
+              tweepy_stream, stream_listener, run_coroutine_threadsafe):
         """Setup for the tests
         """
         # Create a fake bot
@@ -384,7 +395,8 @@ class TestCogsTwitter(TestCase):
             'tweet': 'testContent',
             'tweet_url': 'https://twitter.com/tweeter_test/status/5',
             'account_id': '0',
-            'media_url': []
+            'media_url': [],
+            'is_send_by_bot': True
         }
         self.twitter._send_tweet_object(tweet_object_content)
         tweet_db = models.session.query(models.Tweet).filter(

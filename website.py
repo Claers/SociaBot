@@ -87,7 +87,6 @@ def get_user(discord):
         base_discord_api_url + '/users/@me/guilds').json()
     # set user owned guild if guild is in DataBase
     for user_guild in user_guilds:
-        print(user_guild)
         guild = models.session.query(models.Server).filter(
             models.Server.server_id == str(user_guild['id'])).first()
         if guild is not None:
@@ -143,7 +142,7 @@ def oauth_callback_discord():
     # create an object of Oauth2Session
     discord = OAuth2Session(
         client_id=client_id,
-        redirect_uri=request.host_url + "oauth_callback_discord",
+        redirect_uri=request.host_url[:-1] + url_for('oauth_callback_discord'),
         state=session['state'],
         scope=scope
     )
@@ -165,6 +164,8 @@ def oauth_callback_discord():
         get_user(discord)
     else:
         get_user(discord)
+    file = open("need_to_reload", "w")
+    file.close()
     return redirect(url_for('index'))
 
 
@@ -269,6 +270,8 @@ def oauth_callback_twitter():
     else:
         session['twitter_account_exist'] = True
     get_user(discord)
+    file = open("need_to_reload", "w")
+    file.close()
     return(redirect(url_for('twitter')))
 
 
@@ -280,7 +283,6 @@ def twitter_update_infos():
     if request.method == 'POST':
         data = request.json
         for server_data in data:
-            print(server_data)
             server = models.session.query(models.Server).filter(
                 models.Server.server_id == str(server_data['server_id'])
             ).first()
@@ -299,6 +301,7 @@ def twitter_update_infos():
             except KeyError:
                 server.notification_channel_twitter = None
             server.twitter_notification_enabled = server_data['notif_on']
+            server.retweet_activated = server_data['retweet_notif_on']
             models.session.flush()
             models.session.commit()
         session['twitter_account_updated'] = True

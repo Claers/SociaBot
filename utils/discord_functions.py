@@ -52,7 +52,7 @@ def get_login_url_discord():
     # create an object of Oauth2Session
     oauth = OAuth2Session(
         client_id=client_id,
-        redirect_uri=request.host_url + "oauth_callback_discord",
+        redirect_uri=request.host_url[:-1] + url_for('oauth_callback_discord'),
         scope=scope
     )
     # get the login url and the state
