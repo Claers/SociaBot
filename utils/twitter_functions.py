@@ -20,7 +20,7 @@ def twitter_get_resource_token():
     request_token = OAuth1Session(
         client_key=twitter_consumer_key,
         client_secret=twitter_consumer_secret,
-        callback_uri=request.host_url[:-1] + url_for('oauth_callback_twitter')
+        callback_uri=request.host_url + 'sociabot/' + 'oauth_callback_twitter'
     )
     # twitter endpoint to get request token
     url = 'https://api.twitter.com/oauth/request_token'

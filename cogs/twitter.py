@@ -69,6 +69,8 @@ class Twitter(Cog):
                 self.stream[server_id].filter(follow=[id], is_async=True)
 
     async def wait_for_reload_config(self):
+        """A function used to wait for a file to tell when reload variables
+        """
         while True:
             is_file_exist = os.path.isfile("./need_to_reload")
             if is_file_exist:
@@ -356,11 +358,7 @@ class Twitter(Cog):
         return json_data["media_id_string"], auth
 
     async def tweet_func(self, ctx):
-        """This function is used when command !tweet [text] is send
-        This is the main logic for sending a tweet
-
-        Arguments:
-            ctx : The context of the command
+        """This is the main logic for sending a tweet
         """
         tweet = ctx.message.clean_content.replace(
             '!tweet', '{0} :'.format(ctx.author.name))
@@ -395,9 +393,14 @@ class Twitter(Cog):
     @commands.command()
     @checks.is_server()
     async def tweet(self, ctx):
+        """This function is used when command !tweet [text] is send
+        """
         await self.tweet_func(ctx)
 
     async def tweet_delete_func(self, ctx):
+        """This function is used to delete a tweet from twitter and into the
+        database
+        """
         tweetURL = ctx.message.clean_content.replace('!dTweet ', '')
         tweet_object = models.session.query(
             models.Tweet).filter(models.Tweet.tweet_url ==
@@ -430,6 +433,9 @@ class Twitter(Cog):
     @checks.is_server()
     @checks.is_server_admin()
     async def tweet_delete(self, ctx):
+        """This function is used when command !dTweet [tweet url or tweet id]
+        is send
+        """
         await self.tweet_delete_func(ctx)
 
 
@@ -461,8 +467,6 @@ class MyStreamListener(tweepy.StreamListener):
                 is_retweet = True
             except KeyError:
                 is_retweet = False
-            print("rt_activated : " + server.retweet_activated)
-            print("is retweet : " + is_retweet)
             if server.retweet_activated is not None:
                 if is_retweet is True and server.retweet_activated is False:
                     return "stop"
@@ -492,13 +496,17 @@ class MyStreamListener(tweepy.StreamListener):
                     'media_url': tweet['medias_url'],
                     'is_send_by_bot': False
                 }
-                self.bot.cogs['Twitter']._send_tweet_object(
-                    tweet_object, datetime.fromtimestamp(tweet['timestamp']))
+                if 'Twitter' in self.bot.cogs:
+                    self.bot.cogs['Twitter']._send_tweet_object(
+                        tweet_object, datetime.fromtimestamp(tweet['timestamp']
+                                                             ))
+                else:
+                    tweet_db = ""
             while tweet_db is None:
                 tweet_db = models.session.query(models.Tweet).filter(
                     models.Tweet.tweet_url == tweet['tweet_url']
                 ).first()
-            if 'Twitter' in self.bot.cogs and tweet_db.is_send_by_bot is False:
+            if 'Twitter' in self.bot.cogs and not tweet_db.is_send_by_bot:
                 self.bot.cogs['Twitter'].loop_handle(
                     tweet, self.server_id)
             else:

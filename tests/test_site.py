@@ -32,7 +32,7 @@ class TestSite(TestCase):
     def test_index_not_logged(self):
         """Test if the login_required decorator works
         """
-        response = self.app.get("/")
+        response = self.app.get("/sociabot/")
         self.assertTrue(response.status_code == 302)
 
     @mock.patch('requests_oauthlib.OAuth2Session.get',
@@ -45,7 +45,7 @@ class TestSite(TestCase):
         with self.app.session_transaction() as sess:
             sess['discord_token'] = "0"
             sess['black_theme'] = True
-        response = self.app.get("/")
+        response = self.app.get("/sociabot/")
         # test if request is done successfully
         self.assertTrue(response.status_code == 200)
         # test if username is passed successfully from user_infos

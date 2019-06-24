@@ -142,7 +142,7 @@ def oauth_callback_discord():
     # create an object of Oauth2Session
     discord = OAuth2Session(
         client_id=client_id,
-        redirect_uri=request.host_url[:-1] + url_for('oauth_callback_discord'),
+        redirect_uri=request.host_url + 'sociabot/' + 'oauth_callback_discord',
         state=session['state'],
         scope=scope
     )
@@ -402,7 +402,9 @@ def twitch_get_stream_notif():
     if request.method == "GET":
         return request.args.get('hub.challenge')
     else:
-        print(request.json)
+        file = open("twitch_notif", "w")
+        file.write(request.json)
+        file.close()
         return(request.json)
 
 

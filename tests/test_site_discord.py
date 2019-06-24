@@ -86,7 +86,7 @@ class TestDiscordUtilsFunctions(TestCase):
     def test_get_login_url_discord(self, oauth_authorization_url):
         """Test the get_login_url_discord function
         """
-        with self.app.test_request_context('/discord'):
+        with self.app.test_request_context('/sociabot/discord'):
             url = discord_funcs.get_login_url_discord()
             self.assertEqual('discord.login.url', url)
             self.assertEqual(flask.session['state'], "000")

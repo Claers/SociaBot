@@ -376,7 +376,8 @@ class TestCogsTwitter(TestCase):
             discord_admin_id="0",
             admin_id=user.id,
             twitter_account_linked=tw_account.id,
-            twitter_notification_enabled=True
+            twitter_notification_enabled=True,
+            notification_channel_twitter="0"
         )
         models.session.add(server)
         models.session.flush()
@@ -552,6 +553,8 @@ class TestCogsTwitter(TestCase):
 
     @async_test
     async def test_tweet_func_without_account(self):
+        """Test the twitter.Twitter.tweet_func function without account
+        """
         state = MockState()
         author = MockUser()
         message = MockMessage("!tweet test", author, state)
@@ -566,6 +569,10 @@ class TestCogsTwitter(TestCase):
 
     @async_test
     async def test_tweet_delete(self):
+        """Test the twitter.Twitter.tweet_delete_func
+        This function is used to delete a tweet from twitter and into the
+        database
+        """
         state = MockState()
         author = MockUser()
         message = MockMessage("!tweet test", author, state)
@@ -609,13 +616,9 @@ class TestCogsTwitter(TestCase):
         with mock.patch('tweepy.API',
                         side_effect=MockTweepyAPI):
             message = await self.twitter.get_tweet(tweet, 0)
-            self.assertEqual(message, None)
-        tweet_db = models.session.query(models.Tweet).filter(
-            models.Tweet.tweet_url == tweet['tweet_url']
-        ).first()
-        tweet_media = tweet_db.media_id[0]
-        self.assertEqual(tweet['tweet_content'], tweet_db.tweet_content)
-        self.assertEqual(tweet['medias_url'][0], tweet_media.media_url)
+            self.assertEqual(
+                message,
+                "Nouveau tweet : https://twitter.com/tweeter_test/status/5")
 
     @async_test
     async def test_get_tweet_func_already_in_db(self):
@@ -634,7 +637,9 @@ class TestCogsTwitter(TestCase):
         with mock.patch('tweepy.API',
                         side_effect=MockTweepyAPI):
             message = await self.twitter.get_tweet(tweet, 0)
-            self.assertEqual(None, message)
+            self.assertEqual(
+                message,
+                "Nouveau tweet : https://twitter.com/tweeter_test/status/5")
         tweet_db = models.session.query(models.Tweet).filter(
             models.Tweet.tweet_url == tweet['tweet_url']
         ).first()
