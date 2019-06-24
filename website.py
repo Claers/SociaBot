@@ -1,20 +1,22 @@
 """This website is used to configurate SociaBot for user
 """
-import cogs.utils.settings as settings
-import cogs.utils.models as models
-import cogs.utils.languages as lang
-import utils.twitter_functions as twitter_func
-import utils.twitch_functions as twitch_func
-import utils.discord_functions as discord_func
+import json
+import os
+from functools import wraps
+
+import oauthlib
 from flask import Flask
 from flask import session, request, url_for
 from flask import redirect, render_template
 from requests_oauthlib import OAuth2Session
-import oauthlib
-from functools import wraps
-import os
 from urllib.parse import quote_plus, unquote
-import bot
+
+import utils.twitter_functions as twitter_func
+import utils.twitch_functions as twitch_func
+import utils.discord_functions as discord_func
+import cogs.utils.settings as settings
+import cogs.utils.models as models
+
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 template_dir = os.path.normpath(os.path.join(dir_path, './site/templates'))
@@ -403,7 +405,8 @@ def twitch_get_stream_notif():
         return request.args.get('hub.challenge')
     else:
         file = open("cogs/twitch_notif", "w")
-        file.write(request.json)
+        data = json.dumps(request.json)
+        file.write(data)
         file.close()
         return(request.json)
 
