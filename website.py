@@ -401,6 +401,7 @@ def twitch_notif(server):
 
 @app.route('/sociabot/stream_webhook', methods=['POST', 'GET'])
 def twitch_get_stream_notif():
+    print(request.args)
     if request.method == "GET":
         return request.args.get('hub.challenge')
     else:
@@ -408,7 +409,7 @@ def twitch_get_stream_notif():
         data = json.dumps(request.json)
         file.write(data)
         file.close()
-        return(request.json)
+        return request.args.get('hub.challenge')
 
 
 @app.route('/sociabot/profile')

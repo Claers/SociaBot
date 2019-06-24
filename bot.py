@@ -17,6 +17,7 @@ extensions = [
     "cogs.admin",
     "cogs.config",
     "cogs.twitter",
+    "cogs.twitch"
 ]
 
 
