@@ -58,7 +58,7 @@ def get_twitch_login_url_handmade():
     state = generate_token()
     session['state'] = state
     login_url_req = {
-        "response_type": "token",
+        "response_type": "code",
         "client_id": twitch_client_id,
         "redirect_uri": request.host_url + 'sociabot/' +
         "oauth_callback_twitch",
@@ -70,7 +70,7 @@ def get_twitch_login_url_handmade():
 
 
 def get_twitch_token_handmade():
-    code = request.agrs.get('code')
+    code = request.args.get('code')
     fetch_token_req = {
         "code": code,
         "client_id": twitch_client_id,

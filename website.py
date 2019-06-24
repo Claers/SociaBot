@@ -402,7 +402,7 @@ def twitch_get_stream_notif():
     if request.method == "GET":
         return request.args.get('hub.challenge')
     else:
-        file = open("twitch_notif", "w")
+        file = open("utils/twitch_notif", "w")
         file.write(request.json)
         file.close()
         return(request.json)
