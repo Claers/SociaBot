@@ -132,6 +132,7 @@ class TwitchAccountWebhook(Base):
     id = Column(Integer, primary_key=True)
     twitch_id = Column(String)
     server_id = Column(String)
+    new_notif = Column(Boolean)
 
 
 Base.metadata.create_all(engine)

@@ -16,15 +16,17 @@ class Twitch(Cog):
             coro, loop)
 
     async def wait_for_twitch_notif(self):
-        path = os.path.dirname(os.path.abspath(__file__))
         twitch_notif_data = {}
         while True:
-            is_file_exist = os.path.isfile(path + "/twitch_notif")
-            if is_file_exist:
-                with open(path + "/twitch_notif") as f:
-                    twitch_notif_data = json.loads(f.read())
+            webhook = models.session.query(
+                models.TwitchAccountWebhook
+            ).filter(
+                models.TwitchAccountWebhook.new_notif == True
+            ).first()
+            webhook.new_notif = False
+            models.session.commit()
+            if webhook is not None:
                 await self.send_twitch_notif(twitch_notif_data)
-                os.remove(path + "/twitch_notif")
             else:
                 await asyncio.sleep(3)
 

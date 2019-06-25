@@ -1,7 +1,8 @@
 import os
 import sys
 
-import utils.twitch_functions.py as twitch_function
+import envvar
+import utils.twitch_functions as twitch_function
 import cogs.utils.settings as settings
 import bot
 import website
