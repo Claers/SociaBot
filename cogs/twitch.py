@@ -23,6 +23,7 @@ class Twitch(Cog):
                 models.TwitchAccountWebhook.new_notif == True
             ).all()
             for webhook in webhooks:
+                print(webhook)
                 webhook.new_notif = False
                 models.session.commit()
                 await self.send_twitch_notif(webhook)

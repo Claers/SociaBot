@@ -134,5 +134,10 @@ class TwitchAccountWebhook(Base):
     server_id = Column(String)
     new_notif = Column(Boolean)
 
+    def __repr__(self):
+        return "< TwitchAccountWebhook(twitch_id='{}', server_id='{}', \
+                                       new_notif='{}') >".format(
+            self.twitch_id, self.server_id, self.new_notif)
+
 
 Base.metadata.create_all(engine)
