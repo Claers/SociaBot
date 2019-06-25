@@ -127,4 +127,11 @@ class TwitchAccount(Base):
         }
 
 
+class TwitchAccountWebhook(Base):
+    __tablename__ = "twitch_account_webhook"
+    id = Column(Integer, primary_key=True)
+    twitch_id = Column(String)
+    server_id = Column(String)
+
+
 Base.metadata.create_all(engine)

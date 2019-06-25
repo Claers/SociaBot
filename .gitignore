@@ -63,8 +63,6 @@ target/
 .pytest_cache/
 
 
-
-
-start\.py
-
 \.VSCodeCounter/
+
+envvar\.py

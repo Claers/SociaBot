@@ -139,3 +139,9 @@ def add_twitch_account(existing_user, twitch):
         guild.twitch_account_linked = twitch_account.id
     models.session.flush()
     models.session.commit()
+
+
+def update_webhook():
+    webhooks = models.session.query(models.TwitchAccountWebhook).all()
+    for webhook in webhooks:
+        twitch_stream_set_webhook(webhook.user_id, "subscribe")

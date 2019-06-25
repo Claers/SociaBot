@@ -423,9 +423,35 @@ def twitch_update_info():
                     if server_data['notif_on']:
                         twitch_func.twitch_stream_set_webhook(
                             server_data['twitch_account_id'], "unsubscribe")
+                        webhook = models.session.query(
+                            models.TwitchAccountWebhook
+                        ).filter(
+                            models.TwitchAccountWebhook.twitch_id ==
+                            server_data['twitch_account_id']
+                        ).filter(models.TwitchAccountWebhook.server_id ==
+                                 server_data['server_id']
+                                 ).first()
+                        if webhook is not None:
+                            models.session.delete(webhook)
+                            models.session.commit()
                     else:
                         twitch_func.twitch_stream_set_webhook(
                             server_data['twitch_account_id'], "subscribe")
+                        webhook = models.session.query(
+                            models.TwitchAccountWebhook
+                        ).filter(
+                            models.TwitchAccountWebhook.twitch_id ==
+                            server_data['twitch_account_id']
+                        ).filter(models.TwitchAccountWebhook.server_id ==
+                                 server_data['server_id']
+                                 ).all()
+                        if webhook is not None:
+                            webhook_obj = models.TwitchAccountWebhook(
+                                server_id=server_data['server_id'],
+                                twitch_id=server_data['twitch_account_id']
+                            )
+                            models.session.add(webhook_obj)
+                            models.session.commit()
             except KeyError:
                 server.twitch_account_linked = None
             try:
