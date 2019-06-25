@@ -23,7 +23,7 @@ class Twitch(Cog):
             ).filter(
                 models.TwitchAccountWebhook.new_notif == True
             ).first()
-            print(webhook)
+            print(webhook.twitch_id)
             if webhook is not None:
                 webhook.new_notif = False
                 models.session.commit()
@@ -39,6 +39,8 @@ class Twitch(Cog):
         servers_linked = models.session.query(models.Server).filter(
             models.Server.twitch_account_linked == twitch_account.id
         ).all()
+        print(twitch_account)
+        print(servers_linked)
         for server_linked in servers_linked:
             message = "En live !" + \
                 twitch_notif_data['data'][0]['user_name']
