@@ -79,8 +79,6 @@ class TwitterAccount(Base):
             'id': self.id,
             'user_id': self.user_id,
             'twitter_name': self.twitter_name,
-            'access_token': self.access_token,
-            'access_secret': self.access_secret,
             'account_user_id': self.account_user_id
         }
 
@@ -119,6 +117,14 @@ class TwitchAccount(Base):
     twitch_id = Column(String)
     access_token = Column(String)
     refresh_token = Column(String)
+
+    def _json(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'twitch_name': self.twitch_name,
+            'twitch_id': self.twitch_id
+        }
 
 
 Base.metadata.create_all(engine)

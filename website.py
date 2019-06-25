@@ -101,6 +101,7 @@ def get_user(discord):
         existing_user.discord_guild_ids.append(discord_guild)
     models.session.flush()
     models.session.commit()
+    # put twitter account creditentials into session
     if twitter_accounts is not None:
         twitter_accounts_cred = []
         for twitter_account in twitter_accounts:
@@ -111,6 +112,7 @@ def get_user(discord):
             creditentials.append(twitter_account.id)
             twitter_accounts_cred.append(creditentials)
         session['twitter_accounts'] = twitter_accounts_cred
+    # put twitch account creditentials into session
     if twitch_account is not None:
         twitch_account_cred = []
         creditentials = []
@@ -203,20 +205,26 @@ def twitter():
     session['ro_secret'] = resource[1]
     avatar = discord.get(discord_cdn + 'avatars/' +
                          user_info['id'] + '/' + user_info['avatar'] + '.png')
+    # get all twitter account linked to user
     twitter_accounts = models.session.query(models.TwitterAccount).filter(
         models.TwitterAccount.user_id == session['user_id']
     ).all()
     twitter_accounts_json = []
+    # get twitter account json
     for twitter_account in twitter_accounts:
         twitter_accounts_json.append(twitter_account._json())
+    # get all guild where user is the admin
     bot_user_guilds = models.session.query(models.Server).filter(
         models.Server.admin_id == str(session['user_id'])
     ).all()
+    # get all channels for the guilds
     channels = discord_func.get_text_channels_for_user(
         bot_user_guilds)
+    # get guilds json
     bot_user_guilds_json = []
     for bot_user_guild in bot_user_guilds:
         bot_user_guilds_json.append(bot_user_guild._json())
+    # notification manager
     if session.get("twitter_account_added") is not None:
         confirm_tw_added = True
         session.pop("twitter_account_added")
@@ -319,6 +327,7 @@ def twitch():
     if session.get('twitch_token') is not None:
         twitch = OAuth2Session(
             twitch_func.twitch_client_id, token=session['twitch_token'])
+        # get twitch user info
         twitch_user_info = twitch_func.get_twitch_infos(twitch)
         if type(twitch_user_info) == dict:
             discord = OAuth2Session(client_id, token=session['discord_token'])
@@ -330,13 +339,36 @@ def twitch():
                 base_discord_api_url + '/users/@me/guilds').json()
             owned_guilds, bot_owned_guilds = discord_func.own_guilds(
                 user_guilds)
+            # get twitch accounts linked to user
+            twitch_accounts = models.session.query(
+                models.TwitchAccount).filter(
+                models.TwitchAccount.user_id == session['user_id']
+            ).all()
+            # twitch accounts json
+            twitch_accounts_json = []
+            for twitch_account in twitch_accounts:
+                twitch_accounts_json.append(twitch_account._json())
+            # get all guild where user is the admin
+            bot_user_guilds = models.session.query(models.Server).filter(
+                models.Server.admin_id == str(session['user_id'])
+            ).all()
+            # get all channels for the guilds
+            channels = discord_func.get_text_channels_for_user(
+                bot_user_guilds)
+            # get guilds json
+            bot_user_guilds_json = []
+            for bot_user_guild in bot_user_guilds:
+                bot_user_guilds_json.append(bot_user_guild._json())
             return render_template(
                 "twitch.html",
                 black_theme=session['black_theme'],
                 twitch_login_url=twitch_login_url,
                 twitch_account=twitch_user_info,
                 owned_guilds=bot_owned_guilds,
-                avatar_url=avatar.url
+                avatar_url=avatar.url,
+                twitch_accounts=twitch_accounts_json,
+                channels=channels,
+                bot_user_guilds=bot_user_guilds_json,
             )
         else:
             return twitch_user_info
@@ -372,36 +404,46 @@ def oauth_callback_twitch():
     return redirect(url_for('twitch'))
 
 
-@app.route('/sociabot/twitch_notif/<server>')
+@app.route('/sociabot/twitch_update_info', methods=['POST'])
 @login_required
-def twitch_notif(server):
-    """Toggle twitch notification
-
-    Arguments:
-        server {int} -- server id to toggle twitch notification
+def twitch_update_info():
+    """View used only in POST to get data from twitch configuration page
     """
-    server_obj = models.session.query(models.Server).filter(
-        models.Server.id == server
-    ).first()
-    twitch_account = models.session.query(models.TwitchAccount).filter(
-        models.TwitchAccount.id == server_obj.twitch_account_linked
-    ).first()
-    if server_obj.twitch_notification_enabled:
-        server_obj.twitch_notification_enabled = False
-        twitch_func.twitch_stream_set_webhook(
-            twitch_account.twitch_id, "unsubscribe")
-    else:
-        server_obj.twitch_notification_enabled = True
-        twitch_func.twitch_stream_set_webhook(
-            twitch_account.twitch_id, "subscribe")
-    models.session.flush()
-    models.session.commit()
-    return redirect(url_for('twitch'))
+    if request.method == "POST":
+        data = request.json
+        for server_data in data:
+            server = models.session.query(models.Server).filter(
+                models.Server.server_id == str(server_data['server_id'])
+            ).first()
+            try:
+                if not (server_data['twitch_account_id'] == "None" or
+                        server_data['twitch_account_id'] is None):
+                    server.twitch_account_linked = int(
+                        server_data['twitch_account_id'])
+                    if server_data['notif_on']:
+                        twitch_func.twitch_stream_set_webhook(
+                            server_data['twitch_account_id'], "unsubscribe")
+                    else:
+                        twitch_func.twitch_stream_set_webhook(
+                            server_data['twitch_account_id'], "subscribe")
+            except KeyError:
+                server.twitch_account_linked = None
+            try:
+                if not (server_data['notif_id'] == "None" or
+                        server_data['notif_id'] is None):
+                    server.notification_channel_twitch = str(
+                        server_data['notif_id'])
+            except KeyError:
+                server.notification_channel_twitch = None
+            server.twitch_notification_enabled = server_data['notif_on']
+            models.session.flush()
+            models.session.commit()
+        session['twitch_account_updated'] = True
+        return str(data)
 
 
 @app.route('/sociabot/stream_webhook', methods=['POST', 'GET'])
 def twitch_get_stream_notif():
-    print(request.args)
     if request.method == "GET":
         return request.args.get('hub.challenge')
     else:

@@ -25,41 +25,110 @@ Twitch
                 Bienvenue dans l'assistant de configuration de SociaBot {{username}} !
             </h1>
         </div>
-        {% if twitch_account is none %}
-        <div class="level">
-            <a class="level-item has-text-centered button twitch-invite" href="{{twitch_login_url}}">
-                Connecter votre compte Twitch
-            </a>
-        </div>
-        {% else %}
-        <div class="level">
-            <a class="level-item has-text-centered button twitch-invite" href="{{twitch_login_url}}">
-                Connecter un autre compte Twitch
-            </a>
-        </div>
-        <div class="level">
-            <h3 class="title level-item has-text-centered">
-                Activer les notifs de live pour&nbsp;
-                <a href="https://www.twitch.tv/{{twitch_account['login']}}">{{twitch_account['display_name']}}</a>
-                &nbsp;sur :
-            </h3>
-        </div>
-        {% for owned_guild in owned_guilds %}
-        <div class="level">
-            <p class="subtitle level-item has-text-centered" id="{{ owned_guild.id }}">
-                {{ owned_guild.server_name }}
-            </p>
-            <div class="level-item ">
-                <input id="notifs" class="checkbox" type="checkbox" name="notifs" class="switch is-success"
-                    {% if owned_guild.twitch_notification_enabled %} checked="checked" {% endif %}
-                    onclick="location.href='{{ url_for('twitch_notif', server=owned_guild.id) }}'">
-                <label class="subtitle after-checkbox" for="notif">{% if owned_guild.twitch_notification_enabled %}
-                    Activé {% else %} Désactivé {% endif %}</label>
+        {% if twitch_accounts is not none %}
+        <div>
+            <div class="tabs is-toggle scroll">
+                <ul>
+                    {% for i in range(bot_user_guilds|length) %}
+                    <li class="{% if i == 0%}is-active {%endif%} server-list">
+                        <a class="subtitle" onclick="openServer('{{bot_user_guilds[i].server_id}}', this);">
+                            {{bot_user_guilds[i].server_name}}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div id="twitch">
+                {% for i in range(bot_user_guilds|length) %}
+                <div class="twitch-update" id="{{bot_user_guilds[i].server_id}}" {% if i != 0%}style="display:none"
+                    {%endif%}>
+                    <div class="level">
+                        <div class="level-item has-text-centered subtitle">
+                            Utiliser le compte :
+                        </div>
+                        <div class="dropdown level-item has-text-centered twitch_accounts">
+                            <div class="dropdown-trigger">
+                                <button onclick="toggleDropdown(this);" class="button" aria-haspopup="true"
+                                    aria-controls="dropdown-menu">
+                                    <span>Selectionnez un compte</span>
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="dropdown-menu twitch_account_dropdown" role="select">
+                                <div class="dropdown-content">
+                                    <a onclick="twitch_account_id['{{bot_user_guilds[i].server_id}}'] = 'None'; contentSelect(this, 'unselect');"
+                                        class="dropdown-item">
+                                        None
+                                    </a>
+                                    {% for n in range(twitch_accounts|length) %}
+                                    <a onclick="twitch_account_id['{{bot_user_guilds[i].server_id}}'] = '{{ twitch_accounts[n]['id'] }}'; contentSelect(this, 'twitch');"
+                                        class="dropdown-item">
+                                        {{twitch_accounts[n]['twitch_name']}}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="level-item has-text-centered subtitle">
+                            sur le serveur : {{bot_user_guilds[i].server_name}}
+                        </div>
+                    </div>
+                    <div class="level">
+                        <div class="level-item">
+                            <label class="subtitle" for="notif">
+                                Notification :</label>
+                            <input onclick="changeText(this);" class="checkbox notif" type="checkbox" name="notifs"
+                                class="switch is-success" disabled>
+                            <label class="subtitle after-checkbox notif-text" for="notif">Désactivé</label>
+                        </div>
+                        <div class="level-item has-text-centered subtitle">
+                            sur le channel :
+                        </div>
+                        <div class="dropdown level-item has-text-centered channels_id">
+                            <div class="dropdown-trigger">
+                                <button onclick="toggleDropdown(this);" class="button" aria-haspopup="true"
+                                    aria-controls="dropdown-menu">
+                                    <span>Selectionnez un channel</span>
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="dropdown-menu twitch_account_dropdown" role="select">
+                                <div class="dropdown-content">
+                                    <a onclick="channel_id['{{bot_user_guilds[i].server_id}}'] = 'None'; contentSelect(this, 'unselect');"
+                                        class="dropdown-item">
+                                        None
+                                    </a>
+                                    {% for n in range(channels[bot_user_guilds[i].server_id]|length) %}
+                                    <a onclick="channel_id['{{bot_user_guilds[i].server_id}}'] = '{{ channels[bot_user_guilds[i].server_id][n]['id'] }}'; contentSelect(this, 'channel');"
+                                        class="dropdown-item">
+                                        {{channels[bot_user_guilds[i].server_id][n]['name']}}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
-        {% endfor %}
         {% endif %}
+        <div class="level">
+            <a class="level-item has-text-centered button twitch-invite" onclick="sendJsonData(this);">
+                Sauvegarder
+            </a>
+        </div>
     </div>
 </section>
+<script>
+    var twitch = document.getElementById('twitch');
+    var servers = twitch.children;
+    var bot_user_guilds = JSON.parse('{{ bot_user_guilds | tojson | safe }}');
+</script>
 <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+<script src="{{ url_for('static', filename='js/twitch.js') }}"></script>
 {% endblock content %}
