@@ -105,7 +105,7 @@ def get_twitch_infos(twitch):
     Get twitch user infos
     API ref : https://dev.twitch.tv/docs/api/reference/#get-users
     """
-    twitch_login_url = get_twitch_login_url()
+    twitch_login_url = get_twitch_login_url_handmade()
     try:
         twitch_user_info = json.loads(twitch.get(
             "https://api.twitch.tv/helix/users").text)['data'][0]
