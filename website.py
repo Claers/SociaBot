@@ -455,7 +455,7 @@ def twitch_update_info():
                         ).filter(models.TwitchAccountWebhook.server_id ==
                                  server.server_id
                                  ).all()
-                        if webhook is not None:
+                        if webhook is None:
                             webhook_obj = models.TwitchAccountWebhook(
                                 server_id=server.server_id,
                                 twitch_id=twitch_id
