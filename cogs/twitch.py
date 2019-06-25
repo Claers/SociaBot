@@ -23,9 +23,9 @@ class Twitch(Cog):
             ).filter(
                 models.TwitchAccountWebhook.new_notif == True
             ).first()
-            webhook.new_notif = False
-            models.session.commit()
             if webhook is not None:
+                webhook.new_notif = False
+                models.session.commit()
                 await self.send_twitch_notif(twitch_notif_data)
             else:
                 await asyncio.sleep(3)

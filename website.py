@@ -418,6 +418,7 @@ def twitch_update_info():
             try:
                 if not (server_data['twitch_account_id'] == "None" or
                         server_data['twitch_account_id'] is None):
+                    print(server_data['twitch_account_id'])
                     server.twitch_account_linked = int(
                         server_data['twitch_account_id'])
                     if server_data['notif_on']:
@@ -473,10 +474,13 @@ def twitch_get_stream_notif():
     if request.method == "GET":
         return request.args.get('hub.challenge')
     else:
+        print(request.json[
+            'data'][0]['user_id'])
         webhooks = models.session.query(models.TwitchAccountWebhook).filter(
             models.TwitchAccountWebhook.twitch_id == request.json[
                 'data'][0]['user_id']
         ).all()
+        print(webhooks)
         for webhook in webhooks:
             webhook.new_notif = True
         return "ok"
