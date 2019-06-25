@@ -23,6 +23,7 @@ class Twitch(Cog):
             ).filter(
                 models.TwitchAccountWebhook.new_notif == True
             ).first()
+            print(webhook)
             if webhook is not None:
                 webhook.new_notif = False
                 models.session.commit()

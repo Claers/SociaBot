@@ -474,15 +474,18 @@ def twitch_get_stream_notif():
     if request.method == "GET":
         return request.args.get('hub.challenge')
     else:
-        print(request.json[
-            'data'][0]['user_id'])
-        webhooks = models.session.query(models.TwitchAccountWebhook).filter(
-            models.TwitchAccountWebhook.twitch_id == request.json[
-                'data'][0]['user_id']
-        ).all()
-        print(webhooks)
-        for webhook in webhooks:
-            webhook.new_notif = True
+        try:
+            print(request.json[
+                'data'][0]['user_id'])
+            webhooks = models.session.query(models.TwitchAccountWebhook).filter(
+                models.TwitchAccountWebhook.twitch_id == request.json[
+                    'data'][0]['user_id']
+            ).all()
+            print(webhooks)
+            for webhook in webhooks:
+                webhook.new_notif = True
+        except IndexError:
+            pass
         return "ok"
 
 
