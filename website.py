@@ -473,10 +473,12 @@ def twitch_get_stream_notif():
     if request.method == "GET":
         return request.args.get('hub.challenge')
     else:
-        file = open("cogs/twitch_notif", "w")
-        data = json.dumps(request.json)
-        file.write(data)
-        file.close()
+        webhooks = models.session.query(models.TwitchAccountWebhook).filter(
+            models.TwitchAccountWebhook.twitch_id == request.json()[
+                'data'][0]['user_id']
+        ).all()
+        for webhook in webhooks:
+            webhook.new_notif = True
         return "ok"
 
 
