@@ -16,34 +16,29 @@ class Twitch(Cog):
             coro, loop)
 
     async def wait_for_twitch_notif(self):
-        twitch_notif_data = {}
         while True:
             webhook = models.session.query(
                 models.TwitchAccountWebhook
             ).filter(
                 models.TwitchAccountWebhook.new_notif == True
             ).first()
-            print(webhook.twitch_id)
             if webhook is not None:
-                webhook.new_notif = False
+                webhook.new_notif = True
                 models.session.commit()
-                await self.send_twitch_notif(twitch_notif_data)
+                await self.send_twitch_notif(webhook)
             else:
                 await asyncio.sleep(3)
 
-    async def send_twitch_notif(self, twitch_notif_data):
+    async def send_twitch_notif(self, webhook):
         twitch_account = models.session.query(models.TwitchAccount).filter(
             models.TwitchAccount.twitch_id ==
-            twitch_notif_data['data'][0]['user_id']
-        )
+            webhook.twitch_id
+        ).first()
         servers_linked = models.session.query(models.Server).filter(
             models.Server.twitch_account_linked == twitch_account.id
         ).all()
-        print(twitch_account)
-        print(servers_linked)
         for server_linked in servers_linked:
-            message = "En live !" + \
-                twitch_notif_data['data'][0]['user_name']
+            message = "En live ! twitch.tv/" + twitch_account.twitch_name
             channel_to_notif_id = server_linked.notification_channel_twitter
             guild = self.bot.get_guild(int(server_linked.server_id))
             for channel in guild.channels:
