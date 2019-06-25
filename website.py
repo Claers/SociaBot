@@ -416,46 +416,56 @@ def twitch_update_info():
                 models.Server.server_id == str(server_data['server_id'])
             ).first()
             try:
+                # see if there's a twitch accound into data
                 if not (server_data['twitch_account_id'] == "None" or
                         server_data['twitch_account_id'] is None):
-                    print(server_data['twitch_account_id'])
+                    twitch_id = models.session.query(
+                        models.TwitchAccount).filter(
+                            models.TwitchAccount.id ==
+                            server_data['twitch_account_id']
+                    ).first().twitch_id
                     server.twitch_account_linked = int(
                         server_data['twitch_account_id'])
-                    if server_data['notif_on']:
+                    # if notification is off unsubscribe webhook from Twitch
+                    # and delete the webhook into database
+                    if not server_data['notif_on']:
                         twitch_func.twitch_stream_set_webhook(
-                            server_data['twitch_account_id'], "unsubscribe")
+                            twitch_id, "unsubscribe")
                         webhook = models.session.query(
                             models.TwitchAccountWebhook
                         ).filter(
                             models.TwitchAccountWebhook.twitch_id ==
-                            server_data['twitch_account_id']
+                            twitch_id
                         ).filter(models.TwitchAccountWebhook.server_id ==
-                                 server_data['server_id']
+                                 server.server_id
                                  ).first()
                         if webhook is not None:
                             models.session.delete(webhook)
                             models.session.commit()
+                    # if notification is on subscribe webhook from Twitch and
+                    # create the webhook into database
                     else:
                         twitch_func.twitch_stream_set_webhook(
-                            server_data['twitch_account_id'], "subscribe")
+                            twitch_id, "subscribe")
                         webhook = models.session.query(
                             models.TwitchAccountWebhook
                         ).filter(
                             models.TwitchAccountWebhook.twitch_id ==
-                            server_data['twitch_account_id']
+                            twitch_id
                         ).filter(models.TwitchAccountWebhook.server_id ==
-                                 server_data['server_id']
+                                 server.server_id
                                  ).all()
                         if webhook is not None:
                             webhook_obj = models.TwitchAccountWebhook(
-                                server_id=server_data['server_id'],
-                                twitch_id=server_data['twitch_account_id']
+                                server_id=server.server_id,
+                                twitch_id=twitch_id
                             )
                             models.session.add(webhook_obj)
                             models.session.commit()
             except KeyError:
                 server.twitch_account_linked = None
             try:
+                # if the notif channel id is specified
                 if not (server_data['notif_id'] == "None" or
                         server_data['notif_id'] is None):
                     server.notification_channel_twitch = str(
@@ -477,13 +487,15 @@ def twitch_get_stream_notif():
         try:
             print(request.json[
                 'data'][0]['user_id'])
-            webhooks = models.session.query(models.TwitchAccountWebhook).filter(
+            webhooks = models.session.query(
+                models.TwitchAccountWebhook).filter(
                 models.TwitchAccountWebhook.twitch_id == request.json[
                     'data'][0]['user_id']
             ).all()
             print(webhooks)
             for webhook in webhooks:
                 webhook.new_notif = True
+            models.session.commit()
         except IndexError:
             pass
         return "ok"
