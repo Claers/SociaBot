@@ -474,7 +474,7 @@ def twitch_get_stream_notif():
         return request.args.get('hub.challenge')
     else:
         webhooks = models.session.query(models.TwitchAccountWebhook).filter(
-            models.TwitchAccountWebhook.twitch_id == request.json()[
+            models.TwitchAccountWebhook.twitch_id == request.json[
                 'data'][0]['user_id']
         ).all()
         for webhook in webhooks:
