@@ -1,10 +1,13 @@
+"""All models of the application
+"""
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy import ForeignKey, Boolean, Table
-import cogs.utils.settings as settings
 from sqlalchemy_utils import URLType
 from sqlalchemy.orm import sessionmaker, relationship
+
+import cogs.utils.settings as settings
 
 Base = declarative_base()
 engine = create_engine(settings.DATABASE_URI)
@@ -19,6 +22,8 @@ server_user_table = Table('server_user', Base.metadata,
 
 
 class User(Base):
+    """This is the user profile
+    """
     __tablename__ = "user"
     id = Column(Integer, primary_key=True)
     discord_user_id = Column(String)

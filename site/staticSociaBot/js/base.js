@@ -87,7 +87,12 @@ function contentSelect(el, type) {
     if (type == "unselect") {
         var server = el.parentElement.parentElement.parentElement.parentElement.parentElement;
         server.querySelector(".notif").disabled = true;
-        server.querySelector(".notif-retweet").disabled = true;
+        try {
+            server.querySelector(".notif-retweet").disabled = true;
+        } catch (error) {
+
+        }
+
     }
     toggleDropdown(el.parentElement);
 }

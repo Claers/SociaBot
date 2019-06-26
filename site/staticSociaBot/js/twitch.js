@@ -38,3 +38,23 @@ function openServer(server_id, el) {
     el.parentElement.classList.add('is-active');
     document.getElementById(server_id).style.display = "block";
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    var servers = window.servers;
+    var server_data = [];
+    var bot_user_guilds = window.bot_user_guilds;
+    for (i = 0; i < servers.length; i++) {
+        var server_id = servers[i].id;
+        for (n = 0; n < bot_user_guilds.length; n++) {
+            if (server_id == bot_user_guilds[n]['server_id']) {
+                server_data = bot_user_guilds[n];
+            }
+        }
+        servers[i].querySelector(".notif").checked = server_data['twitch_notification_enabled'];
+        if (server_data['twitch_notification_enabled']) {
+            servers[i].querySelector(".notif-text").innerHTML = "Activé";
+        } else {
+            servers[i].querySelector(".notif-text").innerHTML = "Désactivé";
+        }
+    }
+});
