@@ -26,9 +26,6 @@ class Twitter(Cog):
 
         Arguments:
             bot {DiscordBot} -- Reference to the bot
-
-        Keyword Arguments:
-            account {dict} -- empty twitter account dict init (default: {})
         """
         self.bot = bot
         self.account = {}
@@ -387,7 +384,7 @@ class Twitter(Cog):
         await ctx.message.delete()
         return await ctx.send(
             "Bravo {0} ! Votre tweet a été envoyé : ".format(
-                ctx.author.name)
+                ctx.author.mention)
             + tweet_object_content['tweet_url'])
 
     @commands.command()
