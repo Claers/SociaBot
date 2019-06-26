@@ -44,6 +44,7 @@ class Twitch(Cog):
         for channel in guild.channels:
             if channel.id == int(channel_to_notif_id):
                 return await channel.send(message)
+        return await True
 
 
 def setup(bot):
