@@ -17,4 +17,4 @@ elif sys.argv[1] == "alembic":
     os.system('alembic revision --autogenerate -m ' + sys.argv[2])
     os.system('alembic upgrade head')
 elif sys.argv[1] == "twitch_webhook_update":
-    twitch_function.update_webhook()
+    twitch_function.update_webhook(sys.argv[2])

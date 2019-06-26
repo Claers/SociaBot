@@ -141,7 +141,17 @@ def add_twitch_account(existing_user, twitch):
     models.session.commit()
 
 
-def update_webhook():
+def update_webhook(url):
     webhooks = models.session.query(models.TwitchAccountWebhook).all()
     for webhook in webhooks:
-        twitch_stream_set_webhook(webhook.twitch_id, "subscribe")
+        url = 'https://api.twitch.tv/helix/webhooks/hub'
+        payload = {
+            "hub.mode": "subscribe",
+            "hub.topic": "https://api.twitch.tv/helix/streams?user_id=" +
+            webhook.twitch_id,
+            "hub.lease_seconds": 864000,
+            "hub.callback":  url +
+            "sociabot/stream_webhook",
+        }
+        headers = {"Client-ID": twitch_client_id}
+        requests.post(url, payload, headers=headers)
