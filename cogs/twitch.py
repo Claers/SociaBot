@@ -51,7 +51,7 @@ class Twitch(Cog):
         server_linked = models.session.query(models.Server).filter(
             models.Server.server_id == webhook.server_id
         ).first()
-        message = "@everyone" + "En live ! https://twitch.tv/" + \
+        message = "@everyone " + "En live ! https://twitch.tv/" + \
             twitch_account.twitch_name
         channel_to_notif_id = server_linked.notification_channel_twitch
         guild = self.bot.get_guild(int(webhook.server_id))
