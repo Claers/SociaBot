@@ -315,6 +315,7 @@ class Twitter(Cog):
                       self.account[str(ctx.guild.id)].access_token,
                       self.account[str(ctx.guild.id)].access_token_secret
                       )
+        # init the post method to twitter
         response = requests.post(
             url, auth=auth, data={
                 "command": "INIT",
@@ -403,6 +404,7 @@ class Twitter(Cog):
         tweet_object = models.session.query(
             models.Tweet).filter(models.Tweet.tweet_url ==
                                  tweetURL).first()
+        # if the tweet exist in database
         if tweet_object is not None:
             medias = tweet_object.media_id
             for media in medias:
@@ -452,6 +454,7 @@ class MyStreamListener(tweepy.StreamListener):
             models.Server.server_id == self.server_id
         ).first()
         if server.twitter_notification_enabled:
+            # variables initialisation from status
             tweet_id = status._json['id']
             user_id = status._json['user']['id_str']
             username = status._json['user']['name']
@@ -460,6 +463,7 @@ class MyStreamListener(tweepy.StreamListener):
             tweet_content = status._json['text']
             timestamp = status._json['timestamp_ms']
             timestamp = int(round(int(timestamp) / 1000))
+            # see if status is a retweet
             try:
                 status._json['retweeted_status']
                 is_retweet = True
@@ -472,6 +476,7 @@ class MyStreamListener(tweepy.StreamListener):
             if 'media' in status._json['entities']:
                 for media in status._json['entities']['media']:
                     medias_url.append(media['url'])
+            # create a tweet dict containing all important information
             tweet = {'tweet_id': tweet_id,
                      'user_id': user_id,
                      'username': username,
@@ -486,6 +491,7 @@ class MyStreamListener(tweepy.StreamListener):
             tweet_db = models.session.query(models.Tweet).filter(
                 models.Tweet.tweet_url == tweet['tweet_url']
             ).first()
+            # if tweet is not into database already
             if tweet_db is None:
                 tweet_object = {
                     'tweet': tweet['tweet_content'],
@@ -500,6 +506,8 @@ class MyStreamListener(tweepy.StreamListener):
                                                              ))
                 else:
                     tweet_db = ""
+            # while the _send_tweet_object is running it can take time to have
+            # the object into database so this is made to wait for it
             while tweet_db is None:
                 tweet_db = models.session.query(models.Tweet).filter(
                     models.Tweet.tweet_url == tweet['tweet_url']

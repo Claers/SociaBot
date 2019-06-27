@@ -547,7 +547,7 @@ class TestCogsTwitter(TestCase):
                         side_effect=MockTweepyAPI):
             ret = await self.twitter.tweet_func(ctx)
             tweet = models.session.query(models.Tweet).first()
-            self.assertIn("testUser", ret)
+            self.assertIn("<@0>", ret)
             self.assertIn("tweet_id", ret)
             self.assertEqual("testUser : test", tweet.tweet_content)
 

@@ -55,6 +55,8 @@ def generate_token(length=30, chars=UNICODE_ASCII_CHARACTER_SET):
 
 
 def get_twitch_login_url_handmade():
+    """This function prepare the twitch url for login
+    """
     state = generate_token()
     session['state'] = state
     login_url_req = {
@@ -70,6 +72,8 @@ def get_twitch_login_url_handmade():
 
 
 def get_twitch_token_handmade():
+    """This function get the twitch tokens
+    """
     code = request.args.get('code')
     fetch_token_req = {
         "code": code,
@@ -87,6 +91,9 @@ def get_twitch_token_handmade():
 
 
 def twitch_stream_set_webhook(user_id, mode):
+    """Set the stream webhook with the wanted mode (subscribe or unsubscribe)
+    and the user id
+    """
     url = 'https://api.twitch.tv/helix/webhooks/hub'
     payload = {
         "hub.mode": mode,

@@ -1,6 +1,5 @@
 """This website is used to configurate SociaBot for user
 """
-import json
 import os
 from functools import wraps
 
@@ -73,7 +72,7 @@ def get_user(discord):
     user_id = discord_func.user_infos(discord)['id']
     # get user object from DataBase
     existing_user = models.session.query(models.User).filter(
-        models.User.discord_user_id == user_id).first()
+        models.User.discord_user_id == str(user_id)).first()
     twitter_accounts = models.session.query(models.TwitterAccount).filter(
         models.TwitterAccount.user_id == existing_user.id
     ).all()
@@ -359,6 +358,16 @@ def twitch():
             bot_user_guilds_json = []
             for bot_user_guild in bot_user_guilds:
                 bot_user_guilds_json.append(bot_user_guild._json())
+            if session.get("twitch_account_exist") is not None:
+                twitch_already_exist = True
+                session.pop("twitch_account_exist")
+            else:
+                twitch_already_exist = False
+            if session.get("twitch_account_added") is not None:
+                confirm_twitch_added = True
+                session.pop("twitch_account_added")
+            else:
+                confirm_twitch_added = False
             return render_template(
                 "twitch.html",
                 black_theme=session['black_theme'],
@@ -369,6 +378,8 @@ def twitch():
                 twitch_accounts=twitch_accounts_json,
                 channels=channels,
                 bot_user_guilds=bot_user_guilds_json,
+                twitch_already_exist=twitch_already_exist,
+                confirm_twitch_added=confirm_twitch_added
             )
         else:
             return twitch_user_info
