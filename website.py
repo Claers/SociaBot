@@ -358,11 +358,6 @@ def twitch():
             bot_user_guilds_json = []
             for bot_user_guild in bot_user_guilds:
                 bot_user_guilds_json.append(bot_user_guild._json())
-            if session.get("twitch_account_exist") is not None:
-                twitch_already_exist = True
-                session.pop("twitch_account_exist")
-            else:
-                twitch_already_exist = False
             if session.get("twitch_account_added") is not None:
                 confirm_twitch_added = True
                 session.pop("twitch_account_added")
@@ -378,7 +373,6 @@ def twitch():
                 twitch_accounts=twitch_accounts_json,
                 channels=channels,
                 bot_user_guilds=bot_user_guilds_json,
-                twitch_already_exist=twitch_already_exist,
                 confirm_twitch_added=confirm_twitch_added
             )
         else:
@@ -411,7 +405,6 @@ def oauth_callback_twitch():
             'twitch_token']['access_token']
         models.session.flush()
         models.session.commit()
-        session['twitch_account_exist'] = True
     return redirect(url_for('twitch'))
 
 
