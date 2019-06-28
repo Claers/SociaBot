@@ -26,7 +26,6 @@ def twitter_get_resource_token():
     url = 'https://api.twitter.com/oauth/request_token'
     # get request_token_key, request_token_secret and other details
     data = request_token.get(url)
-    print(data.text)
     # split the string to get relevant data
     data_token = str.split(data.text, '&')
     ro_key = str.split(data_token[0], '=')

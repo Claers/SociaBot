@@ -15,7 +15,6 @@ client = Bot(command_prefix=settings.BOT_PREFIX)
 
 extensions = [
     "cogs.admin",
-    "cogs.config",
     "cogs.twitter",
     "cogs.twitch"
 ]

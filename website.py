@@ -430,35 +430,38 @@ def twitch_update_info():
                     ).first().twitch_id
                     server.twitch_account_linked = int(
                         server_data['twitch_account_id'])
+                    webhook = models.session.query(
+                        models.TwitchAccountWebhook
+                    ).filter(
+                        models.TwitchAccountWebhook.twitch_id ==
+                        twitch_id
+                    ).filter(models.TwitchAccountWebhook.server_id ==
+                             server.server_id
+                             ).first()
+                    webhook_numbers = models.session.query(
+                        models.TwitchAccountWebhook
+                    ).filter(
+                        models.TwitchAccountWebhook.twitch_id ==
+                        twitch_id
+                    ).all().lenght
                     # if notification is off unsubscribe webhook from Twitch
                     # and delete the webhook into database
                     if not server_data['notif_on']:
-                        twitch_func.twitch_stream_set_webhook(
-                            twitch_id, "unsubscribe")
-                        webhook = models.session.query(
-                            models.TwitchAccountWebhook
-                        ).filter(
-                            models.TwitchAccountWebhook.twitch_id ==
-                            twitch_id
-                        ).filter(models.TwitchAccountWebhook.server_id ==
-                                 server.server_id
-                                 ).first()
+                        # if there's more than one webhook connected to this
+                        # user id don't unsub it
+                        if webhook_numbers == 1:
+                            twitch_func.twitch_stream_set_webhook(
+                                twitch_id, "unsubscribe")
                         if webhook is not None:
                             models.session.delete(webhook)
                             models.session.commit()
                     # if notification is on subscribe webhook from Twitch and
                     # create the webhook into database
                     else:
-                        twitch_func.twitch_stream_set_webhook(
-                            twitch_id, "subscribe")
-                        webhook = models.session.query(
-                            models.TwitchAccountWebhook
-                        ).filter(
-                            models.TwitchAccountWebhook.twitch_id ==
-                            twitch_id
-                        ).filter(models.TwitchAccountWebhook.server_id ==
-                                 server.server_id
-                                 ).all()
+                        # if there's no webhook link to this user id create it
+                        if webhook_numbers == 0:
+                            twitch_func.twitch_stream_set_webhook(
+                                twitch_id, "subscribe")
                         if webhook is None:
                             webhook_obj = models.TwitchAccountWebhook(
                                 server_id=server.server_id,
