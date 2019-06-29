@@ -4,6 +4,7 @@ import os
 from functools import wraps
 
 import oauthlib
+import requests
 from flask import Flask
 from flask import session, request, url_for
 from flask import redirect, render_template
@@ -184,7 +185,13 @@ def index():
         return redirect(url_for('discord_connection'))
     if user_info['avatar'] is not None:
         avatar = discord.get(discord_cdn + 'avatars/' +
-                             user_info['id'] + '/' + user_info['avatar'] + '.png')
+                             user_info['id'] + '/' +
+                             user_info['avatar'] + '.png')
+    else:
+        avatar = requests.models.Response()
+        avatar.status_code = 200
+        avatar.url = "https://www.logolynx.com/images/logolynx/" + \
+            "78/789b6b54fecdc26206697625fd0a02bf.jpeg"
     return render_template(
         "index.html",
         black_theme=session['black_theme'],
@@ -205,7 +212,13 @@ def twitter():
     session['ro_secret'] = resource[1]
     if user_info['avatar'] is not None:
         avatar = discord.get(discord_cdn + 'avatars/' +
-                             user_info['id'] + '/' + user_info['avatar'] + '.png')
+                             user_info['id'] + '/' +
+                             user_info['avatar'] + '.png')
+    else:
+        avatar = requests.models.Response()
+        avatar.status_code = 200
+        avatar.url = "https://www.logolynx.com/images/logolynx/" + \
+            "78/789b6b54fecdc26206697625fd0a02bf.jpeg"
     # get all twitter account linked to user
     twitter_accounts = models.session.query(models.TwitterAccount).filter(
         models.TwitterAccount.user_id == session['user_id']
@@ -338,6 +351,11 @@ def twitch():
                                      user_info['id'] + '/' +
                                      user_info['avatar']
                                      + '.png')
+            else:
+                avatar = requests.models.Response()
+                avatar.status_code = 200
+                avatar.url = "https://www.logolynx.com/images/logolynx/" + \
+                    "78/789b6b54fecdc26206697625fd0a02bf.jpeg"
             user_guilds = discord.get(
                 base_discord_api_url + '/users/@me/guilds').json()
             owned_guilds, bot_owned_guilds = discord_func.own_guilds(
@@ -521,7 +539,13 @@ def profile():
     user_info = discord_func.user_infos(discord)
     if user_info['avatar'] is not None:
         avatar = discord.get(discord_cdn + 'avatars/' +
-                             user_info['id'] + '/' + user_info['avatar'] + '.png')
+                             user_info['id'] + '/' +
+                             user_info['avatar'] + '.png')
+    else:
+        avatar = requests.models.Response()
+        avatar.status_code = 200
+        avatar.url = "https://www.logolynx.com/images/logolynx/" + \
+            "78/789b6b54fecdc26206697625fd0a02bf.jpeg"
     user_guilds = discord.get(
         base_discord_api_url + '/users/@me/guilds').json()
     owned_guilds, bot_owned_guilds = discord_func.own_guilds(user_guilds)
