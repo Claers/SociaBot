@@ -1,5 +1,5 @@
 from requests_oauthlib import OAuth1Session
-from flask import request, url_for
+from flask import request
 import cogs.utils.settings as settings
 import cogs.utils.models as models
 

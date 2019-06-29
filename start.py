@@ -1,3 +1,5 @@
+"""A file that can help to run the app and make some commands
+"""
 import os
 import sys
 

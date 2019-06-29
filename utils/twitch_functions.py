@@ -1,3 +1,5 @@
+"""Contains all twitch functions for website
+"""
 import json
 import random
 

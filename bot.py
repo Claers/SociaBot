@@ -1,12 +1,11 @@
-import threading
+"""The bot main file
+"""
 from datetime import datetime
-import sys
 
 import discord
 from discord.ext.commands import Bot
 from discord.ext.commands.errors import CheckFailure
 
-import website
 import cogs.utils.settings as settings
 import cogs.utils.models as models
 import cogs.utils.languages as lang
@@ -96,7 +95,4 @@ async def on_command_error(ctx, error):
 if __name__ == '__main__':
     for extension in extensions:
         client.load_extension(extension)
-    flasktr = threading.Thread(target=website.app.run)
-    bottr = threading.Thread(target=client.run, args=(
-        settings.discord_bot_token,))
-    bottr.start()
+    client.run(settings.discord_bot_token)

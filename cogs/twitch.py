@@ -1,6 +1,4 @@
 import asyncio
-import os
-import json
 
 from discord.ext.commands import Cog
 

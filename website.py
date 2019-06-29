@@ -182,8 +182,9 @@ def index():
         user_info = discord_func.user_infos(discord)
     except oauthlib.oauth2.rfc6749.errors.TokenExpiredError:
         return redirect(url_for('discord_connection'))
-    avatar = discord.get(discord_cdn + 'avatars/' +
-                         user_info['id'] + '/' + user_info['avatar'] + '.png')
+    if user_info['avatar'] is not None:
+        avatar = discord.get(discord_cdn + 'avatars/' +
+                             user_info['id'] + '/' + user_info['avatar'] + '.png')
     return render_template(
         "index.html",
         black_theme=session['black_theme'],
@@ -202,8 +203,9 @@ def twitter():
     resource = twitter_func.twitter_get_resource_token()
     session['ro_key'] = resource[0]
     session['ro_secret'] = resource[1]
-    avatar = discord.get(discord_cdn + 'avatars/' +
-                         user_info['id'] + '/' + user_info['avatar'] + '.png')
+    if user_info['avatar'] is not None:
+        avatar = discord.get(discord_cdn + 'avatars/' +
+                             user_info['id'] + '/' + user_info['avatar'] + '.png')
     # get all twitter account linked to user
     twitter_accounts = models.session.query(models.TwitterAccount).filter(
         models.TwitterAccount.user_id == session['user_id']
@@ -331,9 +333,11 @@ def twitch():
         if type(twitch_user_info) == dict:
             discord = OAuth2Session(client_id, token=session['discord_token'])
             user_info = discord_func.user_infos(discord)
-            avatar = discord.get(discord_cdn + 'avatars/' +
-                                 user_info['id'] + '/' + user_info['avatar']
-                                 + '.png')
+            if user_info['avatar'] is not None:
+                avatar = discord.get(discord_cdn + 'avatars/' +
+                                     user_info['id'] + '/' +
+                                     user_info['avatar']
+                                     + '.png')
             user_guilds = discord.get(
                 base_discord_api_url + '/users/@me/guilds').json()
             owned_guilds, bot_owned_guilds = discord_func.own_guilds(
@@ -515,8 +519,9 @@ def profile():
     """
     discord = OAuth2Session(client_id, token=session['discord_token'])
     user_info = discord_func.user_infos(discord)
-    avatar = discord.get(discord_cdn + 'avatars/' +
-                         user_info['id'] + '/' + user_info['avatar'] + '.png')
+    if user_info['avatar'] is not None:
+        avatar = discord.get(discord_cdn + 'avatars/' +
+                             user_info['id'] + '/' + user_info['avatar'] + '.png')
     user_guilds = discord.get(
         base_discord_api_url + '/users/@me/guilds').json()
     owned_guilds, bot_owned_guilds = discord_func.own_guilds(user_guilds)
